@@ -13,6 +13,7 @@ let app = new Vue({
                 { text: "Accion" , value: "accion", align: "center"}
             ],
             users: [],
+            countries: [],
             message: "Esta funcionando",            
         }
     },
@@ -28,8 +29,18 @@ let app = new Vue({
                 } );
             }
         )
+        
+        this.countries = JSON.parse( localStorage.getItem("wpt_countries") ) || [];
+        this.countries.forEach( 
+            ( country, $index ) => {
+                this.countries[$index].label = country.name.common
+            }
+        )
+        this.countries = this.countries.filter( country => {
+            return country.enable
+        } )
         this.users = $t.users;
-        await this.getData()
+        await this.getData();
     },
     methods: {
         async getData(){

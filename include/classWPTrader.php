@@ -169,7 +169,7 @@ class WP_Trader {
     public static function init() {
         add_action( 'admin_head', array('WP_Trader', 'dependecies') );
         add_action( 'admin_menu', array('WP_Trader', 'create_menu') );
-        add_action( 'admin_footer', array('WP_Trader', 'javascript_ajax') );
+        add_action( 'admin_footer', array('WP_Trader', 'app') );
         add_action( 'wp_ajax_wpt_save_data', array('WP_Trader', 'wpt_save_data') );
     }
 
@@ -240,68 +240,23 @@ class WP_Trader {
         ?>
             <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
             <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
-
-        <?php
-        if( self::$production ){
-        ?>
             <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
-        <?php
-        }else{
-        ?>
-            <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
-        <?php
-        }    
-        ?>
             <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
             <script type="text/javascript">
-                class WPTrader {
-                    constructor(fields, users, investments, rates){
-                        this.fields = fields;
-                        this.users = users;
-                        this.rates = rates;
-                        this.investments = investments;
-                    }
-
-                    getUser(id) {
-                        return this.users.filter( user => user.id == id );
-                    }
-
-                    getRates(mount) {
-                        return this.rates.filter( rate => {
-                            if( ( rate.mountdown <= mount ) && ( rate.mountup >= mount ) ){
-                                return rate;
-                            }
-                        } );
-                    }
-
-                    fields(){
-                        return this.fields;
-                    }
-
-                    getMountAll( id ){
-                        let investments = this.investments.filter( investment => investment.usuario == id );
-                        let total = 0;
-                        investments.forEach( 
-                            investment => 
-                            {
-                                total += investment.monto
-                            }
-                        )
-                        return total;
-
-                    }
-                    
-                }
-                let $t = new WPTrader(<?=self::get('wpt_user_fields',true)?>,<?=self::get('wpt_users', true)?>,<?=self::get('wpt_investment',true)?>,<?=self::get('wpt_rates',true)?>);
+            <?php
+                include "countries.js";
+                include "classwpt.js";
+            ?>
+            let $t = new WPTrader(<?=self::get('wpt_user_fields',true)?>,<?=self::get('wpt_users', true)?>,<?=self::get('wpt_investment',true)?>,<?=self::get('wpt_rates',true)?>);
             </script>
         <?php
-
-
     }
 
     public static function app(){
+        echo "<script type='text/javascript'>";
         include 'app.js';
+        echo "</script>";
     }
 
 }

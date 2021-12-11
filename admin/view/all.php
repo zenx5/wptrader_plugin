@@ -20,7 +20,7 @@
 </style>
 <div class="trader-app-container">
     
-    <div id="wp-trader-app">
+    <div id="wp-trader-app" data-app>
         <v-card>
             <v-toolbar>
                 <v-tabs v-model="tab">
@@ -36,10 +36,5 @@
             </v-tabs-items>
         </v-card>
     </div>
-
-
-    <script>
-        <?php WP_Trader::app(); ?>
-    </script>
 </div>
 

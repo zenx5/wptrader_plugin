@@ -30,6 +30,16 @@
                             <span v-if="editRow != index">{{item.correo}}</span>
                             <v-text-field type="email" :value="item.correo" v-else />
                         </template>
+                        <template #item.pais="{item, index}">
+                            <v-select
+                                :items="countries"
+                                item-text="label"
+                                item-value="label"
+                                label="Country"
+                                v-model="item.pais"
+                                :disabled="editRow != index">
+                            </v-select>
+                        </template>
                         
                         <template #item.accion="{item, index}">
                             <span class="action">
