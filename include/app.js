@@ -6,12 +6,45 @@ let app = new Vue({
         return {
             render: false,
             tab: 0,
+            details: -1,
             editRow: -1,
-            tabs: ["Dashboard", "Settings","About"],
+            tabs: ["Dashboard", "Settings", "Details"],
             title: "Title of the Dashboard",
-            headers: [
-                { text: "Accion" , value: "accion", align: "center"}
+            headerSetting:[
+                { text: "Color" , value: "color", align: "center" },
+                { text: "Rate" , value: "rate", align: "center" },
+                { text: "Inversion Mínima" , value: "investmin", align: "center" },
+                { text: "Inversion Máxima" , value: "investmax", align: "center" },
+                { text: "Accion" , value: "action", align: "center" }
             ],
+            rates: [
+                {
+                    color: "#fff",
+                    rate: 0,
+                    investmin: 0,
+                    investmax: 0
+                }
+            ],
+            newRate: {
+                color: "#fff",
+                rate: 0,
+                investmin: 0,
+                investmax: 0
+            },
+            headers: [
+                { text: "Accion" , value: "accion", align: "center" }
+            ],
+            temp: {
+                id: "",
+                nombre: "",
+                apellido: "",
+                cedula: "",
+                correo: "",
+                pais: "",
+                postalcode: "",
+                telefono: "",
+                monto: ""
+            },
             users: [],
             countries: [],
             message: "Esta funcionando",            
@@ -43,8 +76,32 @@ let app = new Vue({
         await this.getData();
     },
     methods: {
+        createRate(){
+            this.rates.push(this.newRate);
+            this.newRate = {
+                color: "#fff",
+                rate: 0,
+                investmin: 0,
+                investmax: 0
+            };
+        },
+        deleteRate( $index ){
+            this.rates = this.rates.filter( 
+                ( rate, index ) =>
+                {
+                    return index != $index;
+                }
+            )
+        },
+        detailsMode(tab) {
+            if(this.details == -1){
+                return ! (this.tabs.indexOf(tab) == 2);
+            }
+            else{
+                return (this.tabs.indexOf(tab) == 2);
+            }
+        },
         async getData(){
-            
             this.users.forEach( 
                 (user, index) => {
                     this.users[ index ].monto = $t.getMountAll( user.id )
@@ -52,8 +109,15 @@ let app = new Vue({
                 }
             )
         },
-        view() {
-            console.log("view");
+        view(index) {
+            if( this.details == -1 ) {
+                this.details = index;
+                this.temp = this.users[index]
+                this.tab = 2;
+            }else{ 
+                this.details = -1;
+                this.tab = 0;
+            }
         },
         edit( $index ) {
             console.log( "Edit "+$index )
@@ -74,6 +138,12 @@ let app = new Vue({
         },
         del() {
             console.log("del");
+        },
+        getColor(monto){
+            console.log(monto)
+            if(monto<100) return "#00ff00";
+            else if(monto<200) return "#ffff00";
+            else return "#ff3333";
         }
 
     },
