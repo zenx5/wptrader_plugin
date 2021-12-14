@@ -93,22 +93,31 @@
                 <v-row>
                     <v-col col="3">
                         <v-text-field 
-                            label="Nombre">
+                            label="Nombre"
+                            v-model="temp.nombre"
+                            counter>
                         </v-text-field>                    
                     </v-col>
                     <v-col col="3">
                         <v-text-field
-                            label="Apellido">
+                            label="Apellido"
+                            v-model="temp.apellido"
+                            counter>
                         </v-text-field>                    
                     </v-col>
                     <v-col col="3">
                         <v-text-field
-                            label="Cedula">
+                            label="Cedula"
+                            v-model="temp.cedula"
+                            counter>
                         </v-text-field>                    
                     </v-col>
                     <v-col col="3">
                         <v-text-field
-                            label="Correo">
+                            type="email"
+                            label="Correo"
+                            v-model="temp.correo"
+                            counter>
                         </v-text-field>                    
                     </v-col>
                 </v-row>
@@ -118,17 +127,22 @@
                             :items="countries"
                             item-text="label"
                             item-value="label"
-                            label="Pais">
+                            label="Pais"
+                            v-model="temp.pais">
                         </v-select>
                     </v-col>
                     <v-col col="3">
                         <v-text-field
-                            label="Codigo Postal">
+                            label="Codigo Postal"
+                            v-model="temp.postalcode"
+                            counter>
                         </v-text-field>
                     </v-col>
                     <v-col col="3">
                         <v-text-field
-                            label="Telefono">
+                            label="Telefono"
+                            v-model="temp.telefono"
+                            counter>
                         </v-text-field>
                     </v-col>
                     <v-col col="3">
