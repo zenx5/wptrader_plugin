@@ -52,7 +52,7 @@ let app = new Vue({
                 pais: "",
                 postalcode: "",
                 telefono: "",
-                monto: ""
+                monto: 0
             },
             users: [],
             countries: [],
@@ -160,17 +160,28 @@ let app = new Vue({
             this.editRow = $index            
         },
         async save( $index ) {
-            console.log( $index, this.users[ $index ] )
-
             let dataSend = new FormData();
             dataSend.append('action', 'wpt_save_data');
             dataSend.append('index', $index);
-            dataSend.append('value', JSON.stringify( this.users[ $index ] ) );
+            if( $index == -1 ) {
+                let max = 0;
+                this.users.forEach( user => {
+                    if( user.id > max ) max = user.id;
+                })
+                this.temp[ 'id' ] = max + 1;
+                dataSend.append('value', JSON.stringify( this.temp ) );
+            }else{
+                dataSend.append('value', JSON.stringify( this.users[ $index ] ) );
+                this.editRow = -1
+            }
             const { status, statusText, data } = await axios.post(ajaxurl, dataSend)
-            console.log( data )
-            
-            console.log( data )
-            this.editRow = -1            
+            let id = this.users.findIndex(user => user.id == data.id )
+            if( id == -1 ) {
+                this.users.push( data );
+            }else{
+                this.users[ id ] = data;
+            }
+            this.render = ! this.render;
         },
         del() {
             console.log("del");

@@ -24,8 +24,8 @@ class WP_Trader {
          *      rate => { float }
          *  ]
          */
-        'wpt_investment' => [
-            [
+        'wpt_investments' => [
+           /* [
                 "usuario" => 1,
                 "fecha" => "9-3-2021",
                 "monto" => 50
@@ -39,10 +39,10 @@ class WP_Trader {
                 "usuario" => 1,
                 "fecha" => "11-1-2021",
                 "monto" => 100
-            ]
+            ]*/
         ],
         'wpt_users' => [
-            [
+            /*[
                 "id" => 1,
                 "nombre" => "Octavio",
                 "apellido" => "Martinez",
@@ -67,7 +67,7 @@ class WP_Trader {
                 "postalcode" => "8045",
                 "telefono" => "04124792931",
                 "monto" => 0,
-            ]
+            ]*/
         ],
         'wpt_user_fields' => [ 
             "monto" => "Monto",
@@ -87,7 +87,7 @@ class WP_Trader {
     }
 
     public static function get( $key , $as_string  = false ) {
-        return $as_string?json_encode( self::$settings[ $key ] ):self::$settings[ $key ];
+        return $as_string?json_encode( get_option( $key ) ):get_option( $key );
     }
 
     public static function active() {
@@ -100,8 +100,8 @@ class WP_Trader {
             'db_created' => false,
             'plugin_active' => false,
             'wpt_rates' => [],
-            'wpt_investment' => [
-                [
+            'wpt_investments' => [
+              /*  [
                     "usuario" => 1,
                     "fecha" => "9-3-2021",
                     "monto" => 50
@@ -115,10 +115,10 @@ class WP_Trader {
                     "usuario" => 1,
                     "fecha" => "11-1-2021",
                     "monto" => 100
-                ]
+                ]*/
             ],
             'wpt_users' => [
-                [
+             /*   [
                     "id" => 1,
                     "nombre" => "Octavio",
                     "apellido" => "Martinez",
@@ -143,7 +143,7 @@ class WP_Trader {
                     "postalcode" => "8045",
                     "telefono" => "04124792931",
                     "monto" => 0,
-                ]
+                ]*/
             ],
             'wpt_user_fields' => [ 
                 "monto" => "Monto",
@@ -208,7 +208,18 @@ class WP_Trader {
             "index" => $_POST['index'],
             "value" => json_decode( str_replace("\\","",$_POST['value']), true )
         ];
-        echo json_encode( $content );
+        if( $_POST['index'] == -1 ) {
+            if( $content['value']['nombre'] == -1 ) {
+                self::update_settings( 'wpt_users', array() );
+                self::update_settings( 'wpt_investments', array() );
+            }else{
+                self::$settings['wpt_users'][] = $content['value'];
+                self::update_settings( 'wpt_users', self::$settings['wpt_users'] );
+            }
+            echo json_encode( $content['value'] );
+        }else{
+
+        }
         wp_die();
     }
 
@@ -252,7 +263,7 @@ class WP_Trader {
                 include "countries.js";
                 include "classwpt.js";
             ?>
-            let $t = new WPTrader(<?=self::get('wpt_user_fields',true)?>,<?=self::get('wpt_users', true)?>,<?=self::get('wpt_investment',true)?>,<?=self::get('wpt_rates',true)?>);
+            let $t = new WPTrader(<?=self::get('wpt_user_fields',false)?>,<?=self::get('wpt_users', false)?>,<?=self::get('wpt_investments',false)?>,<?=self::get('wpt_rates',false)?>);
             </script>
         <?php
     }
