@@ -87,6 +87,58 @@
                 </v-col>
             </v-row>
         </v-card-text>
+        <v-card-text>
+            <v-card-title>Nuevo Inversor</v-card-title>
+            <v-form>    
+                <v-row>
+                    <v-col col="3">
+                        <v-text-field 
+                            label="Nombre">
+                        </v-text-field>                    
+                    </v-col>
+                    <v-col col="3">
+                        <v-text-field
+                            label="Apellido">
+                        </v-text-field>                    
+                    </v-col>
+                    <v-col col="3">
+                        <v-text-field
+                            label="Cedula">
+                        </v-text-field>                    
+                    </v-col>
+                    <v-col col="3">
+                        <v-text-field
+                            label="Correo">
+                        </v-text-field>                    
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col col="3">
+                        <v-select
+                            :items="countries"
+                            item-text="label"
+                            item-value="label"
+                            label="Pais">
+                        </v-select>
+                    </v-col>
+                    <v-col col="3">
+                        <v-text-field
+                            label="Codigo Postal">
+                        </v-text-field>
+                    </v-col>
+                    <v-col col="3">
+                        <v-text-field
+                            label="Telefono">
+                        </v-text-field>
+                    </v-col>
+                    <v-col col="3">
+                        <v-btn>
+                            <v-icon>mdi-content-save</v-icon>Guardar
+                        </v-btn>
+                    </v-col>
+                </v-row>
+            </v-form>
+        </v-card-text>
     </v-card>
 </v-tab-item>
 
