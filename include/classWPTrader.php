@@ -12,7 +12,7 @@ class WP_Trader {
         'menu_slug' => 'trader',
         'icon' => 'dashicons-admin-generic'
     ];
-    protected static $settings = [
+    public static $settings = [
         'db_created' => false,
         'plugin_active' => false,
         'wpt_rates' => [],
@@ -171,6 +171,14 @@ class WP_Trader {
         add_action( 'admin_menu', array('WP_Trader', 'create_menu') );
         add_action( 'admin_footer', array('WP_Trader', 'app') );
         add_action( 'wp_ajax_wpt_save_data', array('WP_Trader', 'wpt_save_data') );
+        add_shortcode( 'statususer', array('WP_Trader', 'shortcode' ) );
+        function shortcode($atts,$content ){
+            return "<h2>Mi shortcode</h2>";        
+        }
+    }
+
+    public static function shortcode($atts,$content ){
+        return "<h2>Mi shortcode 3</h2>";
     }
 
     public static function javascript_ajax(){
@@ -216,20 +224,16 @@ class WP_Trader {
         );
     }
     public static function create_db(){
-        self::update_settings("wpt_rates", array() );
-        self::update_settings("wpt_users", array() );
-        self::update_settings("wpt_user_fields", self::$settings['wpt_user_fields'] );
+        self::update_settings('wpt_rates', array() );
+        self::update_settings('wpt_users', array() );
+        self::update_settings('wpt_user_fields', self::$settings['wpt_user_fields'] );
         self::update_settings('db_created', true);
     }
 
     public static function update_settings($key, $value) {
         if( isset( self::$settings[$key] ) ) {
-            if( update_option( $key, json_encode( $value ) ) ) {
-                self::$settings[$key] = $value;
-            }          
-            else{
-                echo "Valor de $key no se pudo actualizar a ".json_encode($value)."<br>";
-            }
+            update_option( $key, json_encode( $value ));
+            self::$settings[$key] = $value;
         }
     }
 
