@@ -17,14 +17,18 @@
         border: none !important;
         box-shadow: none !important;
     }
+
+    #wp-trader-app .v-input--is-disabled input, #wp-trader-app .v-input--is-disabled .v-select__selection{
+        color: rgba(0,0,0,70%) !important;
+    }
 </style>
 <div class="trader-app-container">
     
-    <div id="wp-trader-app">
+    <div id="wp-trader-app" data-app>
         <v-card>
             <v-toolbar>
                 <v-tabs v-model="tab">
-                    <v-tab v-for="tab in tabs"> {{tab}} </v-tab>
+                    <v-tab v-for="tab in tabs" v-show="detailsMode(tab)"> {{tab}} </v-tab>
                 </v-tabs>
             </v-toolbar>
             <v-tabs-items v-model="tab">
@@ -36,10 +40,5 @@
             </v-tabs-items>
         </v-card>
     </div>
-
-
-    <script>
-        <?php WP_Trader::app(); ?>
-    </script>
 </div>
 

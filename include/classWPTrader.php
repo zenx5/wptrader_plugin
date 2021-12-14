@@ -12,7 +12,7 @@ class WP_Trader {
         'menu_slug' => 'trader',
         'icon' => 'dashicons-admin-generic'
     ];
-    protected static $settings = [
+    public static $settings = [
         'db_created' => false,
         'plugin_active' => false,
         'wpt_rates' => [],
@@ -27,17 +27,17 @@ class WP_Trader {
         'wpt_investment' => [
             [
                 "usuario" => 1,
-                "fecha" => "3-9-2021",
+                "fecha" => "9-3-2021",
                 "monto" => 50
             ],
             [
                 "usuario" => 2,
-                "fecha" => "10-9-2021",
+                "fecha" => "9-10-2021",
                 "monto" => 300
             ],
             [
                 "usuario" => 1,
-                "fecha" => "1-11-2021",
+                "fecha" => "11-1-2021",
                 "monto" => 100
             ]
         ],
@@ -103,17 +103,17 @@ class WP_Trader {
             'wpt_investment' => [
                 [
                     "usuario" => 1,
-                    "fecha" => "3-9-2021",
+                    "fecha" => "9-3-2021",
                     "monto" => 50
                 ],
                 [
                     "usuario" => 2,
-                    "fecha" => "10-9-2021",
+                    "fecha" => "9-10-2021",
                     "monto" => 300
                 ],
                 [
                     "usuario" => 1,
-                    "fecha" => "1-11-2021",
+                    "fecha" => "11-1-2021",
                     "monto" => 100
                 ]
             ],
@@ -169,8 +169,16 @@ class WP_Trader {
     public static function init() {
         add_action( 'admin_head', array('WP_Trader', 'dependecies') );
         add_action( 'admin_menu', array('WP_Trader', 'create_menu') );
-        add_action( 'admin_footer', array('WP_Trader', 'javascript_ajax') );
+        add_action( 'admin_footer', array('WP_Trader', 'app') );
         add_action( 'wp_ajax_wpt_save_data', array('WP_Trader', 'wpt_save_data') );
+        add_shortcode( 'statususer', array('WP_Trader', 'shortcode' ) );
+        function shortcode($atts,$content ){
+            return "<h2>Mi shortcode</h2>";        
+        }
+    }
+
+    public static function shortcode($atts,$content ){
+        return "<h2>Mi shortcode 3</h2>";
     }
 
     public static function javascript_ajax(){
@@ -216,20 +224,16 @@ class WP_Trader {
         );
     }
     public static function create_db(){
-        self::update_settings("wpt_rates", array() );
-        self::update_settings("wpt_users", array() );
-        self::update_settings("wpt_user_fields", self::$settings['wpt_user_fields'] );
+        self::update_settings('wpt_rates', array() );
+        self::update_settings('wpt_users', array() );
+        self::update_settings('wpt_user_fields', self::$settings['wpt_user_fields'] );
         self::update_settings('db_created', true);
     }
 
     public static function update_settings($key, $value) {
         if( isset( self::$settings[$key] ) ) {
-            if( update_option( $key, json_encode( $value ) ) ) {
-                self::$settings[$key] = $value;
-            }          
-            else{
-                echo "Valor de $key no se pudo actualizar a ".json_encode($value)."<br>";
-            }
+            update_option( $key, json_encode( $value ));
+            self::$settings[$key] = $value;
         }
     }
 
@@ -240,68 +244,23 @@ class WP_Trader {
         ?>
             <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
             <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
-
-        <?php
-        if( self::$production ){
-        ?>
             <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
-        <?php
-        }else{
-        ?>
-            <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
-        <?php
-        }    
-        ?>
             <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
             <script type="text/javascript">
-                class WPTrader {
-                    constructor(fields, users, investments, rates){
-                        this.fields = fields;
-                        this.users = users;
-                        this.rates = rates;
-                        this.investments = investments;
-                    }
-
-                    getUser(id) {
-                        return this.users.filter( user => user.id == id );
-                    }
-
-                    getRates(mount) {
-                        return this.rates.filter( rate => {
-                            if( ( rate.mountdown <= mount ) && ( rate.mountup >= mount ) ){
-                                return rate;
-                            }
-                        } );
-                    }
-
-                    fields(){
-                        return this.fields;
-                    }
-
-                    getMountAll( id ){
-                        let investments = this.investments.filter( investment => investment.usuario == id );
-                        let total = 0;
-                        investments.forEach( 
-                            investment => 
-                            {
-                                total += investment.monto
-                            }
-                        )
-                        return total;
-
-                    }
-                    
-                }
-                let $t = new WPTrader(<?=self::get('wpt_user_fields',true)?>,<?=self::get('wpt_users', true)?>,<?=self::get('wpt_investment',true)?>,<?=self::get('wpt_rates',true)?>);
+            <?php
+                include "countries.js";
+                include "classwpt.js";
+            ?>
+            let $t = new WPTrader(<?=self::get('wpt_user_fields',true)?>,<?=self::get('wpt_users', true)?>,<?=self::get('wpt_investment',true)?>,<?=self::get('wpt_rates',true)?>);
             </script>
         <?php
-
-
     }
 
     public static function app(){
+        echo "<script type='text/javascript'>";
         include 'app.js';
+        echo "</script>";
     }
 
 }
