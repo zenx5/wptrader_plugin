@@ -6,10 +6,19 @@ let app = new Vue({
         return {
             render: false,
             tab: 0,
+            tiempoCobro: 180,
             details: -1,
             editRow: -1,
             tabs: ["Dashboard", "Settings", "Details"],
             title: "Title of the Dashboard",
+            headerInvesment: [
+                { text: "Fecha de Inicio" , value: "fecha", align: "center" },
+                { text: "Fecha de Cobro" , value: "fechacobro", align: "center" },
+                { text: "Monto" , value: "monto", align: "center" },
+                { text: "Dias para cobrar" , value: "cobro", align: "center" },
+                { text: "Accion" , value: "action", align: "center" }
+            ],
+            investments: [],
             headerSetting:[
                 { text: "Color" , value: "color", align: "center" },
                 { text: "Rate" , value: "rate", align: "center" },
@@ -75,7 +84,21 @@ let app = new Vue({
         this.users = $t.users;
         await this.getData();
     },
+    filters: {
+        date: value => {
+            let valueArray = value.split("-");
+            return [
+                "Enero", "Febrero", "Marzo",
+                "Abril", "Mayo", "Junio",
+                "julio", "Agosto", "Septiembre",
+                "Octubre", "Noviembre", "Diciembre",
+            ][valueArray[0]]+", "+valueArray[1]+" del "+valueArray[2];
+        }
+    },
     methods: {
+        cobrar(){
+
+        },
         createRate(){
             this.rates.push(this.newRate);
             this.newRate = {
@@ -114,6 +137,19 @@ let app = new Vue({
                 this.details = index;
                 this.temp = this.users[index]
                 this.tab = 2;
+                this.investments = $t.getInvestments( this.users[ index ].id );
+                this.investments.forEach(
+                    ( investment, $index ) =>
+                    {
+                        let hoyms = (new Date()).getTime();
+                        let fechams = (new Date( investment.fecha )).getTime();
+                        let fechacobroms = fechams + this.tiempoCobro*1000*60*60*24;
+                        let fechacobro = new Date( fechacobroms );
+                        this.investments[ $index ].fechacobro = (fechacobro.getMonth() + 1)+"-"+fechacobro.getDate()+"-"+fechacobro.getFullYear();
+                        this.investments[ $index ].cobro = parseInt( ( fechacobroms - hoyms )/1000/60/60/24 );
+
+                    }
+                )
             }else{ 
                 this.details = -1;
                 this.tab = 0;

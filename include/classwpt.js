@@ -6,8 +6,18 @@ class WPTrader {
         this.investments = investments;
     }
 
+    
     getUser(id) {
         return this.users.filter( user => user.id == id );
+    }
+
+    getInvestments(id){
+        return this.investments.filter( 
+            investment =>
+            {
+                return investment.usuario == id;
+            }
+        )
     }
 
     getRates(mount) {

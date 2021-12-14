@@ -27,17 +27,17 @@ class WP_Trader {
         'wpt_investment' => [
             [
                 "usuario" => 1,
-                "fecha" => "3-9-2021",
+                "fecha" => "9-3-2021",
                 "monto" => 50
             ],
             [
                 "usuario" => 2,
-                "fecha" => "10-9-2021",
+                "fecha" => "9-10-2021",
                 "monto" => 300
             ],
             [
                 "usuario" => 1,
-                "fecha" => "1-11-2021",
+                "fecha" => "11-1-2021",
                 "monto" => 100
             ]
         ],
@@ -103,17 +103,17 @@ class WP_Trader {
             'wpt_investment' => [
                 [
                     "usuario" => 1,
-                    "fecha" => "3-9-2021",
+                    "fecha" => "9-3-2021",
                     "monto" => 50
                 ],
                 [
                     "usuario" => 2,
-                    "fecha" => "10-9-2021",
+                    "fecha" => "9-10-2021",
                     "monto" => 300
                 ],
                 [
                     "usuario" => 1,
-                    "fecha" => "1-11-2021",
+                    "fecha" => "11-1-2021",
                     "monto" => 100
                 ]
             ],

@@ -40,6 +40,33 @@
                     <i> {{ temp.telefono }} </i>
                 </v-col>
             </v-row>
+            <v-divider></v-divider>
+            <v-row>
+                <v-col cols="6">
+                    <v-data-table
+                        :headers="headerInvesment"
+                        :items="investments"
+                    >
+                    <template #item.fecha="{item}">
+                        {{ item.fecha | date }}
+                    </template>
+                    <template #item.fechacobro="{item}">
+                        {{ item.fechacobro | date }}
+                    </template>
+                    <template #item.cobro="{item}">
+                        <span v-if="item.cobro>0">
+                            {{ item.cobro }} dias
+                        </span>
+                        <v-chip v-else color="#0f0">Cobrar!!</v-chip>
+                    </template>
+                    <template #item.action="{item}">
+                        <v-icon 
+                            @click="cobrar"
+                            :disabled="item.cobro>0">mdi-content-save</v-icon>
+                    </template>
+                    </v-data-table>
+                </v-col>
+            </v-row>
         </v-card-text>
     
         <v-card-actions>
