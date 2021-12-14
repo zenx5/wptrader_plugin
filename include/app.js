@@ -160,17 +160,17 @@ let app = new Vue({
             this.editRow = $index            
         },
         async save( $index ) {
-            console.log( $index, this.users[ $index ] )
-
             let dataSend = new FormData();
             dataSend.append('action', 'wpt_save_data');
             dataSend.append('index', $index);
-            dataSend.append('value', JSON.stringify( this.users[ $index ] ) );
+            if( $index == -1 ) {
+                dataSend.append('value', JSON.stringify( this.temp ) );
+            }else{
+                dataSend.append('value', JSON.stringify( this.users[ $index ] ) );
+                this.editRow = -1
+            }
             const { status, statusText, data } = await axios.post(ajaxurl, dataSend)
-            console.log( data )
             
-            console.log( data )
-            this.editRow = -1            
         },
         del() {
             console.log("del");

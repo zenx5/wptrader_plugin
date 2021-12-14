@@ -146,7 +146,7 @@
                         </v-text-field>
                     </v-col>
                     <v-col col="3">
-                        <v-btn>
+                        <v-btn @click="save(-1)">
                             <v-icon>mdi-content-save</v-icon>Guardar
                         </v-btn>
                     </v-col>
