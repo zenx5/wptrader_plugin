@@ -102,6 +102,7 @@ let app = new Vue({
         createRate(){
             this.rates.push(this.newRate);
             this.newRate = {
+                id: -1,
                 color: "#fff",
                 rate: 0,
                 investmin: 0,
@@ -156,13 +157,35 @@ let app = new Vue({
                 this.tab = 0;
             }
         },
-        addContent( type, data ) {
+        addContent( type, data, id ) {
             switch( type ) {
                 case 'wpt_users': 
-                    this.users.push( data );
+                    if( id != -1 ){
+                        let index = -1;
+                        this.users.forEach( 
+                            (user, $index) => 
+                            {
+                                if( user.id == id ) index = $index;
+                            }
+                        );
+                        this.users[index] = data;
+                    }else{
+                        this.users.push( data );
+                    }
                     break;
                 case 'wpt_investments': 
-                    this.investments.push( data );
+                    if( id != -1 ){
+                        let index = -1;
+                        this.investments.forEach( 
+                            (investment, $index) => 
+                            {
+                                if( investment.id == id ) index = $index;
+                            }
+                        );
+                        this.investments[index] = data;
+                    }else{
+                        this.investments.push( data );
+                    }
                     break;
             }
         },
@@ -184,18 +207,42 @@ let app = new Vue({
         },
         async edit( $index ) {
             console.log( "Edit "+$index )
-            this.editRow = $index            
+            this.editRow = $index
         },
         async save( type, $index ){
             let dataSend = new FormData();
             dataSend.append('action', 'wpt_save_data');
             dataSend.append('target', type);
-//            dataSend.append('index', $index);
-            dataSend.append('value', JSON.stringify( this.content( type ) ) );
+            dataSend.append('index', $index);
+            if( $index == -1 ){
+                dataSend.append('value', JSON.stringify( this.content( type ) ) );
+            }else{
+                if( type == 'wpt_users') dataSend.append('value', JSON.stringify( this.users.filter( user => user.id == $index )[0] ) );
+                else dataSend.append('value', JSON.stringify( this.rate.filter( rate => rate.id == $index )[0] ) );
+            }
             const { data } = await axios.post(ajaxurl, dataSend);
             console.log( "data : ", data );
             if( data ) {
-                this.addContent( type, data );
+                this.addContent( type, data, $index );
+            }
+            this.editRow = -1;
+            this.newRate = {
+                id: "",
+                nombre: "",
+                apellido: "",
+                cedula: "",
+                correo: "",
+                pais: "",
+                postalcode: "",
+                telefono: "",
+                monto: 0
+            };
+            this.temp = {
+                id: -1,
+                color: "#fff",
+                rate: 0,
+                investmin: 0,
+                investmax: 0
             }
             this.render = ! this.render;
         },
@@ -213,6 +260,24 @@ let app = new Vue({
                 }else{
                     this.rates = this.rates.filter( rate => rate.id != $index );
                 }
+            }
+            this.newRate = {
+                id: "",
+                nombre: "",
+                apellido: "",
+                cedula: "",
+                correo: "",
+                pais: "",
+                postalcode: "",
+                telefono: "",
+                monto: 0
+            };
+            this.temp = {
+                id: -1,
+                color: "#fff",
+                rate: 0,
+                investmin: 0,
+                investmax: 0
             }
             this.render = ! this.render;
         },
