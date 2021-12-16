@@ -78,7 +78,7 @@
                             <span class="action">
                                 <v-icon class="btn-action" @click="view(index)">mdi-eye</v-icon>
                                 <v-icon class="btn-action" @click="edit(index)" v-if="editRow != index">mdi-pencil</v-icon>
-                                <v-icon class="btn-action" @click="save(index)" v-else>mdi-content-save</v-icon>
+                                <v-icon class="btn-action" @click="save('wpt_users', item.id)" v-else>mdi-content-save</v-icon>
                                 <v-icon class="btn-action" @click="del('wpt_users', item.id)">mdi-delete</v-icon>
                             </span>
                         </template>
