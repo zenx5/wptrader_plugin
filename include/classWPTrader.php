@@ -19,56 +19,15 @@ class WP_Trader {
         /**
          *  The struct of the items of the array 
          *  [
+         *      id => { int },
+         *      color => { string },
          *      mountdown => { float },
          *      mountup => { float },
          *      rate => { float }
          *  ]
          */
-        'wpt_investments' => [
-           /* [
-                "usuario" => 1,
-                "fecha" => "9-3-2021",
-                "monto" => 50
-            ],
-            [
-                "usuario" => 2,
-                "fecha" => "9-10-2021",
-                "monto" => 300
-            ],
-            [
-                "usuario" => 1,
-                "fecha" => "11-1-2021",
-                "monto" => 100
-            ]*/
-        ],
-        'wpt_users' => [
-            /*[
-                "id" => 1,
-                "nombre" => "Octavio",
-                "apellido" => "Martinez",
-                "cedula" => "18917255",
-                "correo" => "octavio@mail.com",
-                "pais" => "Venezuela",
-                "ciudad" => "Maturin",
-                "direccion" => "Urb las Carolinas M10#5 ",
-                "postalcode" => "8045",
-                "telefono" => "04124587931",
-                "monto" => 0,
-            ],
-            [
-                "id" => 2,
-                "nombre" => "Javier",
-                "apellido" => "Martinez",
-                "cedula" => "19819231",
-                "correo" => "javier@mail.com",
-                "pais" => "Venezuela",
-                "ciudad" => "Bolivar",
-                "direccion" => "Urb las Carolinas M10#5 ",
-                "postalcode" => "8045",
-                "telefono" => "04124792931",
-                "monto" => 0,
-            ]*/
-        ],
+        'wpt_investments' => [],
+        'wpt_users' => [],
         'wpt_user_fields' => [ 
             "monto" => "Monto",
             "telefono" => "Telefono",
@@ -100,51 +59,8 @@ class WP_Trader {
             'db_created' => false,
             'plugin_active' => false,
             'wpt_rates' => [],
-            'wpt_investments' => [
-              /*  [
-                    "usuario" => 1,
-                    "fecha" => "9-3-2021",
-                    "monto" => 50
-                ],
-                [
-                    "usuario" => 2,
-                    "fecha" => "9-10-2021",
-                    "monto" => 300
-                ],
-                [
-                    "usuario" => 1,
-                    "fecha" => "11-1-2021",
-                    "monto" => 100
-                ]*/
-            ],
-            'wpt_users' => [
-             /*   [
-                    "id" => 1,
-                    "nombre" => "Octavio",
-                    "apellido" => "Martinez",
-                    "cedula" => "18917255",
-                    "correo" => "octavio@mail.com",
-                    "pais" => "Venezuela",
-                    "ciudad" => "Maturin",
-                    "direccion" => "Urb las Carolinas M10#5 ",
-                    "postalcode" => "8045",
-                    "telefono" => "04124587931",
-                    "monto" => 0,
-                ],
-                [
-                    "id" => 2,
-                    "nombre" => "Javier",
-                    "apellido" => "Martinez",
-                    "cedula" => "19819231",
-                    "correo" => "javier@mail.com",
-                    "pais" => "Venezuela",
-                    "ciudad" => "Bolivar",
-                    "direccion" => "Urb las Carolinas M10#5 ",
-                    "postalcode" => "8045",
-                    "telefono" => "04124792931",
-                    "monto" => 0,
-                ]*/
-            ],
+            'wpt_investments' => [],
+            'wpt_users' => [],
             'wpt_user_fields' => [ 
                 "monto" => "Monto",
                 "telefono" => "Telefono",

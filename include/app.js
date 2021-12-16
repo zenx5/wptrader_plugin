@@ -35,6 +35,7 @@ let app = new Vue({
                 }
             ],
             newRate: {
+                id: -1,
                 color: "#fff",
                 rate: 0,
                 investmin: 0,
@@ -82,6 +83,8 @@ let app = new Vue({
             return country.enable
         } )
         this.users = $t.users;
+        this.rates = $t.rates;
+        this.rates.unshift(this.newRate)
         await this.getData();
     },
     filters: {
@@ -108,7 +111,7 @@ let app = new Vue({
                 investmin: 0,
                 investmax: 0
             };
-            axios.post
+            
         },
         deleteRate( $index ){
             this.rates = this.rates.filter( 
@@ -173,26 +176,26 @@ let app = new Vue({
                         this.users.push( data );
                     }
                     break;
-                case 'wpt_investments': 
+                case 'wpt_rates': 
                     if( id != -1 ){
                         let index = -1;
-                        this.investments.forEach( 
-                            (investment, $index) => 
+                        this.rates.forEach( 
+                            (rate, $index) => 
                             {
-                                if( investment.id == id ) index = $index;
+                                if( rate.id == id ) index = $index;
                             }
                         );
-                        this.investments[index] = data;
+                        this.rate[index] = data;
                     }else{
-                        this.investments.push( data );
+                        this.rates.push( data );
                     }
                     break;
             }
         },
         content( type ){
+            let max = 0;
             switch( type ) {
                 case 'wpt_users': 
-                    let max = 0;
                     this.users.forEach( 
                         user => 
                         {
@@ -201,7 +204,15 @@ let app = new Vue({
                     );
                     this.temp.id = max + 1;
                     return this.temp;
-                case 'wpt_investments': return this.newRate;
+                case 'wpt_rates': 
+                    this.rates.forEach( 
+                        rate => 
+                        {
+                            if( rate.id > max ) max = rate.id;
+                        }    
+                    );
+                    this.newRate.id = max + 1;
+                    return this.newRate;
             }
 
         },
@@ -217,8 +228,9 @@ let app = new Vue({
             if( $index == -1 ){
                 dataSend.append('value', JSON.stringify( this.content( type ) ) );
             }else{
-                if( type == 'wpt_users') dataSend.append('value', JSON.stringify( this.users.filter( user => user.id == $index )[0] ) );
-                else dataSend.append('value', JSON.stringify( this.rate.filter( rate => rate.id == $index )[0] ) );
+                if( type == 'wpt_users') { dataSend.append('value', JSON.stringify( this.users.filter( user => user.id == $index )[0] ) ); }
+                else if( type == 'wpt_rates' ) { dataSend.append('value', JSON.stringify( this.rate.filter( rate => rate.id == $index )[0] ) ); }
+                //else { dataSend.append('value', JSON.stringify( this.investments.filter( investment => investment.id == $index )[0] ) ); }
             }
             const { data } = await axios.post(ajaxurl, dataSend);
             console.log( "data : ", data );
@@ -226,8 +238,8 @@ let app = new Vue({
                 this.addContent( type, data, $index );
             }
             this.editRow = -1;
-            this.newRate = {
-                id: "",
+            this.temp = {
+                id: -1,
                 nombre: "",
                 apellido: "",
                 cedula: "",
@@ -237,7 +249,7 @@ let app = new Vue({
                 telefono: "",
                 monto: 0
             };
-            this.temp = {
+            this.newRate = {
                 id: -1,
                 color: "#fff",
                 rate: 0,
@@ -254,15 +266,23 @@ let app = new Vue({
             const { data } = await axios.post(ajaxurl, dataSend);
             console.log( "data : ", data );
             if( data ) {
-                if( type == 'wpt_users') {
-                    console.log(this.users)
+                if( type == 'wpt_users' ) {
                     this.users = this.users.filter( user => user.id != $index );
-                }else{
+                }else if( type == 'wpt_rates' ){
                     this.rates = this.rates.filter( rate => rate.id != $index );
+                    if( this.rates.length == 0){
+                        this.rates.push({
+                            id: -1,
+                            color: "#fff",
+                            rate: 0,
+                            investmin: 0,
+                            investmax: 0
+                        });
+                    }                    
                 }
             }
-            this.newRate = {
-                id: "",
+            this.temp = {
+                id: -1,
                 nombre: "",
                 apellido: "",
                 cedula: "",
@@ -272,7 +292,7 @@ let app = new Vue({
                 telefono: "",
                 monto: 0
             };
-            this.temp = {
+            this.newRate = {
                 id: -1,
                 color: "#fff",
                 rate: 0,
