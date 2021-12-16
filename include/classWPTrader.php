@@ -171,10 +171,12 @@ class WP_Trader {
         add_action( 'admin_menu', array('WP_Trader', 'create_menu') );
         add_action( 'admin_footer', array('WP_Trader', 'app') );
         add_action( 'wp_ajax_wpt_save_data', array('WP_Trader', 'wpt_save_data') );
+        add_action( 'wp_ajax_wpt_delete_data', array('WP_Trader', 'wpt_delete_data') );
+        add_action( 'wp_ajax_wpt_edit_data', array('WP_Trader', 'wpt_edit_data') );
         add_shortcode( 'statususer', array('WP_Trader', 'shortcode' ) );
-        function shortcode($atts,$content ){
-            return "<h2>Mi shortcode</h2>";        
-        }
+        self::$settings['wpt_users'] = get_option('wpt_users');
+        self::$settings['wpt_investment'] = get_option('wpt_investment');
+
     }
 
     public static function shortcode($atts,$content ){
@@ -204,22 +206,42 @@ class WP_Trader {
     }
 
     public static function wpt_save_data(){
-        $content = [
-            "index" => $_POST['index'],
-            "value" => json_decode( str_replace("\\","",$_POST['value']), true )
-        ];
-        if( $_POST['index'] == -1 ) {
-            if( $content['value']['nombre'] == -1 ) {
-                self::update_settings( 'wpt_users', array() );
-                self::update_settings( 'wpt_investments', array() );
-            }else{
-                self::$settings['wpt_users'][] = $content['value'];
-                self::update_settings( 'wpt_users', self::$settings['wpt_users'] );
-            }
-            echo json_encode( $content['value'] );
-        }else{
+        $target = $_POST['target'];
+        $value = json_decode( str_replace("\\","",$_POST['value']), true );
+        $content = json_decode( get_option( $target ), true );
+        $content[] = $value;
+        update_option($target, json_encode( $content ) );
+        echo json_encode( $value );
+        wp_die();
+    }
 
+    public static function wpt_delete_data(){
+        $target = $_POST['target'];
+        $index = $_POST['index'];
+        $content = json_decode( get_option( $target ), true );
+        $aux = [];
+        foreach( $content as $element ) {
+            if( $element['id'] != $index ) {
+                $aux[] = $element;
+            }
         }
+        update_option($target, json_encode( $aux ) );
+        echo json_encode( $aux );
+        wp_die();
+    }
+
+    public static function wpt_edit_data(){
+        $target = $_POST['target'];
+        $value = $_POST['value'];
+        $content = json_decode( get_option( $target ), true );
+        $aux = [];
+        foreach( $content as $index => $element ) {
+            if( $element['id'] == $value['id'] ) {
+                $content[ $index ] = $value;
+            }
+        }
+        update_option($target, json_encode( $content ) );
+        echo json_encode( $value );
         wp_die();
     }
 
