@@ -107,6 +107,7 @@ let app = new Vue({
                 investmin: 0,
                 investmax: 0
             };
+            axios.post
         },
         deleteRate( $index ){
             this.rates = this.rates.filter( 
@@ -155,39 +156,68 @@ let app = new Vue({
                 this.tab = 0;
             }
         },
-        edit( $index ) {
+        addContent( type, data ) {
+            switch( type ) {
+                case 'wpt_users': 
+                    this.users.push( data );
+                    break;
+                case 'wpt_investments': 
+                    this.investments.push( data );
+                    break;
+            }
+        },
+        content( type ){
+            switch( type ) {
+                case 'wpt_users': 
+                    let max = 0;
+                    this.users.forEach( 
+                        user => 
+                        {
+                            if( user.id > max ) max = user.id;
+                        }    
+                    );
+                    this.temp.id = max + 1;
+                    return this.temp;
+                case 'wpt_investments': return this.newRate;
+            }
+
+        },
+        async edit( $index ) {
             console.log( "Edit "+$index )
             this.editRow = $index            
         },
-        async save( $index ) {
+        async save( type, $index ){
             let dataSend = new FormData();
             dataSend.append('action', 'wpt_save_data');
-            dataSend.append('index', $index);
-            if( $index == -1 ) {
-                let max = 0;
-                this.users.forEach( user => {
-                    if( user.id > max ) max = user.id;
-                })
-                this.temp[ 'id' ] = max + 1;
-                dataSend.append('value', JSON.stringify( this.temp ) );
-            }else{
-                dataSend.append('value', JSON.stringify( this.users[ $index ] ) );
-                this.editRow = -1
-            }
-            const { status, statusText, data } = await axios.post(ajaxurl, dataSend)
-            let id = this.users.findIndex(user => user.id == data.id )
-            if( id == -1 ) {
-                this.users.push( data );
-            }else{
-                this.users[ id ] = data;
+            dataSend.append('target', type);
+//            dataSend.append('index', $index);
+            dataSend.append('value', JSON.stringify( this.content( type ) ) );
+            const { data } = await axios.post(ajaxurl, dataSend);
+            console.log( "data : ", data );
+            if( data ) {
+                this.addContent( type, data );
             }
             this.render = ! this.render;
         },
-        del() {
-            console.log("del");
+        async del(type, $index) {
+            let dataSend = new FormData();
+            dataSend.append('action', 'wpt_delete_data');
+            dataSend.append('target', type);
+            dataSend.append('index', $index);
+            const { data } = await axios.post(ajaxurl, dataSend);
+            console.log( "data : ", data );
+            if( data ) {
+                if( type == 'wpt_users') {
+                    console.log(this.users)
+                    this.users = this.users.filter( user => user.id != $index );
+                }else{
+                    this.rates = this.rates.filter( rate => rate.id != $index );
+                }
+            }
+            this.render = ! this.render;
         },
         getColor(monto){
-            console.log(monto)
+            console.log("Monto : ",monto)
             if(monto<100) return "#00ff00";
             else if(monto<200) return "#ffff00";
             else return "#ff3333";

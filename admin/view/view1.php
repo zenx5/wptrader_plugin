@@ -79,7 +79,7 @@
                                 <v-icon class="btn-action" @click="view(index)">mdi-eye</v-icon>
                                 <v-icon class="btn-action" @click="edit(index)" v-if="editRow != index">mdi-pencil</v-icon>
                                 <v-icon class="btn-action" @click="save(index)" v-else>mdi-content-save</v-icon>
-                                <v-icon class="btn-action" @click="del">mdi-delete</v-icon>
+                                <v-icon class="btn-action" @click="del('wpt_users', item.id)">mdi-delete</v-icon>
                             </span>
                         </template>
                     </v-data-table>
@@ -88,7 +88,7 @@
             </v-row>
         </v-card-text>
         <v-card-text>
-            <v-card-title>Nuevo Inversor</v-card-title>
+            <v-card-title>Nuevo Inversor </v-card-title>
             <v-form>    
                 <v-row>
                     <v-col col="3">
@@ -146,7 +146,7 @@
                         </v-text-field>
                     </v-col>
                     <v-col col="3">
-                        <v-btn @click="save(-1)">
+                        <v-btn @click="save('wpt_users',-1)">
                             <v-icon>mdi-content-save</v-icon>Guardar
                         </v-btn>
                     </v-col>
