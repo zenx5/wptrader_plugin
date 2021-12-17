@@ -50,19 +50,18 @@
             </v-row>
             <v-form>
                 <v-row>
-                    <v-col cols="6">
+                    <v-col cols="4">
                         <v-text-field
-                            label="Nombre"
-                            v-model="newInvesment.fecha"
-                            counter>
+                            type="date"
+                            label="Fecha"
+                            v-model="newInvesment.fecha">
                         </v-text-field>
-                    </v-col> 
-                    <v-col cols="6">
                         <v-text-field
-                            label="Apellido"
-                            v-model="newInvesment.monto"
-                            counter>
+                            type="number"
+                            label="Monto"
+                            v-model="newInvesment.monto">
                         </v-text-field>
+
                     </v-col>
                 </v-row>
                 <v-btn >
