@@ -10,7 +10,7 @@
                     <v-col>
                         <v-data-table
                             :headers="headerSetting"
-                            :items="rates"
+                            :items="rates "
                         >
                             <template #item.color="{item, index}">
                                 <v-text-field
@@ -52,6 +52,11 @@
                                 <v-icon v-else @click="del('wpt_rates',item.id)">mdi-delete</v-icon>
                             </template>
                         </v-data-table>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="6">
+                        
                     </v-col>
                 </v-row>
             </v-container>
