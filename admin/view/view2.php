@@ -10,7 +10,7 @@
                     <v-col>
                         <v-data-table
                             :headers="headerSetting"
-                            :items="rates "
+                            :items="rates"
                         >
                             <template #item.color="{item, index}">
                                 <v-text-field
