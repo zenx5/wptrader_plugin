@@ -91,7 +91,7 @@ class WP_Trader {
         //add_action( 'wp_ajax_wpt_edit_data', array('WP_Trader', 'wpt_edit_data') );
         add_shortcode( 'statususer', array('WP_Trader', 'shortcode' ) );
         self::$settings['wpt_users'] = get_option('wpt_users');
-        self::$settings['wpt_investment'] = get_option('wpt_investment');
+        self::$settings['wpt_investments'] = get_option('wpt_investments');
 
     }
 
@@ -170,6 +170,7 @@ class WP_Trader {
     public static function create_db(){
         self::update_settings('wpt_rates', array() );
         self::update_settings('wpt_users', array() );
+        self::update_settings('wpt_investments', array() );
         self::update_settings('wpt_user_fields', self::$settings['wpt_user_fields'] );
         self::update_settings('db_created', true);
     }

@@ -1,11 +1,13 @@
 1) Retirar ingresos generados por inversiones a partir de 30$ (hacerlo variable).
-    input de retiro minimo (dolares): rmin 
-    input plazo de vencimiento (dias): plazo 
+    input de retiro minimo (dolares): rmin (listo)
+    input plazo de vencimiento (dias): plazo (listo)
 
 2) Control de plazo de retiro.
+
 2.1) Notificacion de solicitud de retiro.
 2.2) Notificacion de habilitazion de retiro.
 3) CRUD para las inversiones.
+    ---> Casi listo
 4) Interfaz para el usuario.
 4.1) Vista general de estados.
 4.2) Solicitud de retiros.

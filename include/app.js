@@ -94,12 +94,18 @@ let app = new Vue({
     filters: {
         date: value => {
             let valueArray = value.split("-");
+            if( valueArray[0].length > 2 ){
+                aux = valueArray[0];
+                valueArray[0] = parseInt( valueArray[1] ) - 1;
+                valueArray[1] = valueArray[2];
+                valueArray[2] = aux;
+            }
             return [
                 "Enero", "Febrero", "Marzo",
                 "Abril", "Mayo", "Junio",
                 "julio", "Agosto", "Septiembre",
                 "Octubre", "Noviembre", "Diciembre",
-            ][valueArray[0]]+", "+valueArray[1]+" del "+valueArray[2];
+            ][ parseInt( valueArray[0] ) ]+", "+valueArray[1]+" del "+valueArray[2];
         }, 
         forKey: (elements, key, id) => {
             return elements.filter( element => element[ key ] == id );
@@ -197,6 +203,8 @@ let app = new Vue({
                         this.rates.push( data );
                     }
                     break;
+                case 'wpt_investments':
+                    this.investments.push( data )
             }
         },
         content( type ){
@@ -220,6 +228,10 @@ let app = new Vue({
                     );
                     this.newRate.id = max + 1;
                     return this.newRate;
+                case 'wpt_investments':
+                    this.newInvesment.usuario = this.temp.id;
+                    return this.newInvesment;
+
             }
 
         },
@@ -240,7 +252,6 @@ let app = new Vue({
                 //else { dataSend.append('value', JSON.stringify( this.investments.filter( investment => investment.id == $index )[0] ) ); }
             }
             const { data } = await axios.post(ajaxurl, dataSend);
-            console.log( "data : ", data );
             if( data ) {
                 this.addContent( type, data, $index );
             }
@@ -263,6 +274,10 @@ let app = new Vue({
                 investmin: 0,
                 investmax: 0
             }
+            this.newInvesment = {
+                fecha: '',
+                monto: 0
+            }
             this.render = ! this.render;
         },
         async del(type, $index) {
@@ -271,7 +286,6 @@ let app = new Vue({
             dataSend.append('target', type);
             dataSend.append('index', $index);
             const { data } = await axios.post(ajaxurl, dataSend);
-            console.log( "data : ", data );
             if( data ) {
                 if( type == 'wpt_users' ) {
                     this.users = this.users.filter( user => user.id != $index );

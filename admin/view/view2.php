@@ -10,7 +10,7 @@
                     <v-col>
                         <v-data-table
                             :headers="headerSetting"
-                            :items="rates "
+                            :items="rates"
                         >
                             <template #item.color="{item, index}">
                                 <v-text-field
@@ -42,7 +42,7 @@
                             <template #item.investmax="{item, index}">
                                 <v-text-field 
                                     v-if="index==0"
-                                    type="number" 
+                                    type="number"
                                     v-model="newRate.investmax"
                                     min="0"></v-text-field>
                                 <span v-else>{{item.investmax}}</span>
@@ -54,9 +54,30 @@
                         </v-data-table>
                     </v-col>
                 </v-row>
+                    
+                <v-divider/></v-divider>
+                
+                <v-row>
+                    <v-col>
+                        <h3>Configuraciones generales</h3>
+                    </v-col>
+                </v-row>
                 <v-row>
                     <v-col cols="6">
-                        
+                        <v-text-field 
+                            type="number"
+                            min="0"
+                            v-model="rmin"
+                        >
+                        </v-text-field>
+                    </v-col>
+                    <v-col cols="6">
+                        <v-text-field 
+                            type="number"
+                            min="0"
+                            v-model="plazo"
+                        >
+                        </v-text-field>
                     </v-col>
                 </v-row>
             </v-container>
