@@ -90,6 +90,7 @@
                         <v-icon 
                             @click="cobrar"
                             :disabled="item.cobro>0">mdi-content-save</v-icon>
+                        <v-icon>mdi-delete</v-icon>
                     </template>
                     </v-data-table>
                 </v-col>

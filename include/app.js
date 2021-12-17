@@ -88,14 +88,11 @@ let app = new Vue({
         this.users = $t.users;
         this.rates = $t.rates;
         this.investments = $t.investments;
-        console.log( this.investments )
-        console.log( this.rates )
         this.rates.unshift(this.newRate)
         await this.getData();
     },
     filters: {
         date: value => {
-            console.log( value )
             let valueArray = value.split("-");
             if( valueArray[0].length > 2 ){
                 aux = valueArray[0];
@@ -103,7 +100,6 @@ let app = new Vue({
                 valueArray[1] = valueArray[2];
                 valueArray[2] = aux;
             }
-            console.log( valueArray[0]+", "+valueArray[1]+" del "+valueArray[2] );
             return [
                 "Enero", "Febrero", "Marzo",
                 "Abril", "Mayo", "Junio",
@@ -112,8 +108,6 @@ let app = new Vue({
             ][ parseInt( valueArray[0] ) ]+", "+valueArray[1]+" del "+valueArray[2];
         }, 
         forKey: (elements, key, id) => {
-            console.log( elements )
-            console.log(key, id)
             return elements.filter( element => element[ key ] == id );
         }
     },
@@ -258,7 +252,6 @@ let app = new Vue({
                 //else { dataSend.append('value', JSON.stringify( this.investments.filter( investment => investment.id == $index )[0] ) ); }
             }
             const { data } = await axios.post(ajaxurl, dataSend);
-            console.log( "data : ", data );
             if( data ) {
                 this.addContent( type, data, $index );
             }
@@ -293,7 +286,6 @@ let app = new Vue({
             dataSend.append('target', type);
             dataSend.append('index', $index);
             const { data } = await axios.post(ajaxurl, dataSend);
-            console.log( "data : ", data );
             if( data ) {
                 if( type == 'wpt_users' ) {
                     this.users = this.users.filter( user => user.id != $index );
