@@ -88,20 +88,32 @@ let app = new Vue({
         this.users = $t.users;
         this.rates = $t.rates;
         this.investments = $t.investments;
+        console.log( this.investments )
+        console.log( this.rates )
         this.rates.unshift(this.newRate)
         await this.getData();
     },
     filters: {
         date: value => {
+            console.log( value )
             let valueArray = value.split("-");
+            if( valueArray[0].length > 2 ){
+                aux = valueArray[0];
+                valueArray[0] = parseInt( valueArray[1] ) - 1;
+                valueArray[1] = valueArray[2];
+                valueArray[2] = aux;
+            }
+            console.log( valueArray[0]+", "+valueArray[1]+" del "+valueArray[2] );
             return [
                 "Enero", "Febrero", "Marzo",
                 "Abril", "Mayo", "Junio",
                 "julio", "Agosto", "Septiembre",
                 "Octubre", "Noviembre", "Diciembre",
-            ][valueArray[0]]+", "+valueArray[1]+" del "+valueArray[2];
+            ][ parseInt( valueArray[0] ) ]+", "+valueArray[1]+" del "+valueArray[2];
         }, 
         forKey: (elements, key, id) => {
+            console.log( elements )
+            console.log(key, id)
             return elements.filter( element => element[ key ] == id );
         }
     },
@@ -197,6 +209,8 @@ let app = new Vue({
                         this.rates.push( data );
                     }
                     break;
+                case 'wpt_investments':
+                    this.investments.push( data )
             }
         },
         content( type ){
@@ -220,6 +234,10 @@ let app = new Vue({
                     );
                     this.newRate.id = max + 1;
                     return this.newRate;
+                case 'wpt_investments':
+                    this.newInvesment.usuario = this.temp.id;
+                    return this.newInvesment;
+
             }
 
         },
@@ -262,6 +280,10 @@ let app = new Vue({
                 rate: 0,
                 investmin: 0,
                 investmax: 0
+            }
+            this.newInvesment = {
+                fecha: '',
+                monto: 0
             }
             this.render = ! this.render;
         },

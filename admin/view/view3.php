@@ -61,13 +61,11 @@
                             label="Monto"
                             v-model="newInvesment.monto">
                         </v-text-field>
-
                     </v-col>
                 </v-row>
-                <v-btn >
+                <v-btn @click="save('wpt_investments', -1)">
                     <v-icon>mdi-content-save</v-icon>Agregar
-                </v-btn>
-                
+                </v-btn>                
             </v-form>
             <v-divider></v-divider>
             <v-row>
@@ -103,10 +101,8 @@
                 <v-col cols="6">
                     <v-btn @click="view">Volver</v-btn>
                     <v-btn style="background-color: blue; color:white;">Cobrar</v-btn>
-
                 </v-col>
             </v-row>
         </v-card-actions>
-            
     </v-card>
 </v-tab-item>
