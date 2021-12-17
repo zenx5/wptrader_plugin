@@ -45,13 +45,13 @@
             <v-divider></v-divider>
             <v-row>
                 <v-col>
-                    <h3>Titulo</h3>
+                    <h3>Nueva Inversion</h3>
                 </v-col>
             </v-row>
             <v-form>
                 <v-row>
                     <v-col cols="6">
-                        <v-text-field 
+                        <v-text-field
                             label="Nombre"
                             v-model="newInvesment.fecha"
                             counter>
@@ -66,7 +66,7 @@
                     </v-col>
                 </v-row>
                 <v-btn >
-                    <v-icon>mdi-content-save</v-icon>Guardar
+                    <v-icon>mdi-content-save</v-icon>Agregar
                 </v-btn>
                 
             </v-form>
