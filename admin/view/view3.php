@@ -4,7 +4,9 @@
 ?>
 <v-tab-item >
     <v-card flat>
-        <v-card-title > {{ temp.nombre }} {{ temp.apellido }} </v-card-title>
+        <v-card-title > 
+            {{ temp.nombre }} {{ temp.apellido }}
+        </v-card-title>
         <v-card-subtitle>  {{ temp.cedula }} </v-card-subtitle>
 
         <v-card-text>
@@ -42,10 +44,38 @@
             </v-row>
             <v-divider></v-divider>
             <v-row>
-                <v-col cols="6">
+                <v-col>
+                    <h3>Titulo</h3>
+                </v-col>
+            </v-row>
+            <v-form>
+                <v-row>
+                    <v-col cols="6">
+                        <v-text-field 
+                            label="Nombre"
+                            v-model="newInvesment.fecha"
+                            counter>
+                        </v-text-field>
+                    </v-col> 
+                    <v-col cols="6">
+                        <v-text-field
+                            label="Apellido"
+                            v-model="newInvesment.monto"
+                            counter>
+                        </v-text-field>
+                    </v-col>
+                </v-row>
+                <v-btn >
+                    <v-icon>mdi-content-save</v-icon>Guardar
+                </v-btn>
+                
+            </v-form>
+            <v-divider></v-divider>
+            <v-row>
+                <v-col cols="12">
                     <v-data-table
                         :headers="headerInvesment"
-                        :items="investments"
+                        :items="investments | forKey('usuario',temp.id)"
                     >
                     <template #item.fecha="{item}">
                         {{ item.fecha | date }}

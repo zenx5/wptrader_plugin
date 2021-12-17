@@ -89,7 +89,7 @@
         </v-card-text>
         <v-card-text>
             <v-card-title>Nuevo Inversor </v-card-title>
-            <v-form>    
+            <v-form>
                 <v-row>
                     <v-col col="3">
                         <v-text-field 

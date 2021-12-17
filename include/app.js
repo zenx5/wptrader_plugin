@@ -18,6 +18,7 @@ let app = new Vue({
                 { text: "Dias para cobrar" , value: "cobro", align: "center" },
                 { text: "Accion" , value: "action", align: "center" }
             ],
+            newInvesment: {},
             investments: [],
             headerSetting:[
                 { text: "Color" , value: "color", align: "center" },
@@ -84,6 +85,7 @@ let app = new Vue({
         } )
         this.users = $t.users;
         this.rates = $t.rates;
+        this.investments = $t.investments;
         this.rates.unshift(this.newRate)
         await this.getData();
     },
@@ -96,6 +98,9 @@ let app = new Vue({
                 "julio", "Agosto", "Septiembre",
                 "Octubre", "Noviembre", "Diciembre",
             ][valueArray[0]]+", "+valueArray[1]+" del "+valueArray[2];
+        }, 
+        forKey: (elements, key, id) => {
+            return elements.filter( element => element[ key ] == id );
         }
     },
     methods: {
