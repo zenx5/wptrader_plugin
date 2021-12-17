@@ -14,16 +14,16 @@ let app = new Vue({
             headerInvesment: [
                 { text: "Fecha de Inicio" , value: "fecha", align: "center" },
                 { text: "Fecha de Cobro" , value: "fechacobro", align: "center" },
-                { text: "Monto" , value: "monto", align: "center" },
+                { text: "Monto ($)" , value: "monto", align: "center" },
                 { text: "Dias para cobrar" , value: "cobro", align: "center" },
                 { text: "Accion" , value: "action", align: "center" }
             ],
             investments: [],
             headerSetting:[
                 { text: "Color" , value: "color", align: "center" },
-                { text: "Rate" , value: "rate", align: "center" },
-                { text: "Inversion Mínima" , value: "investmin", align: "center" },
-                { text: "Inversion Máxima" , value: "investmax", align: "center" },
+                { text: "Rate (%)" , value: "rate", align: "center" },
+                { text: "Inversion Mínima ($)" , value: "investmin", align: "center" },
+                { text: "Inversion Máxima ($)" , value: "investmax", align: "center" },
                 { text: "Accion" , value: "action", align: "center" }
             ],
             rates: [
@@ -302,10 +302,16 @@ let app = new Vue({
             this.render = ! this.render;
         },
         getColor(monto){
-            console.log("Monto : ",monto)
-            if(monto<100) return "#00ff00";
-            else if(monto<200) return "#ffff00";
-            else return "#ff3333";
+            let color = "#fff";
+            this.rates.forEach( 
+                rate => 
+                {
+                    if( (monto >= rate.investmin) && (monto < rate.investmax) ) {
+                        color = rate.color;
+                    }
+                }    
+            );
+            return color;
         }
 
     },

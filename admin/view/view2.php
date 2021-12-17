@@ -20,7 +20,7 @@
                                 </v-text-field>
                                 <span 
                                     v-else
-                                    :style="'border-radius: 50%; display: block; background-color:'+item.color+'; width: 25px; height: 25px; padding:1px;'"
+                                    :style="'border-radius: 50%; display: block; background-color:'+item.color+'; width: 25px; height: 25px; padding:1px;border:1px solid black;'"
                                 ></span>
                             </template>
                             <template #item.rate="{item, index}">

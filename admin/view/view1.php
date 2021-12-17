@@ -65,7 +65,7 @@
                         <template #item.monto="{item, index}">
                             <v-chip 
                                 v-if="editRow != index"
-                                style="font-weight: bold;"
+                                style="font-weight: bold; border:1px solid black;"
                                 :color="getColor(item.monto)">
                                 {{item.monto}}
                             </v-chip>
