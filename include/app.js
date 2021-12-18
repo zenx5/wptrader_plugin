@@ -8,7 +8,6 @@ let app = new Vue({
             tab: 0,
             tiempoCobro: 180,
             rmin: 30,
-            plazo: 180,
             details: -1,
             editRow: -1,
             tabs: ["Dashboard", "Settings", "Details"],

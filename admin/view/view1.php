@@ -150,8 +150,7 @@
                             :items="$userswp"
                             item-text="data.display_name"
                             item-value="data.ID"
-                            filled
-                            label="usuario worpress"
+                            label="Usuario WordPress"
                         >
                         </v-select>
                     </v-col>
