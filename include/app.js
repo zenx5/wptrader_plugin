@@ -171,6 +171,17 @@ let app = new Vue({
             }else{
                 this.details = -1;
                 this.tab = 0;
+                this.temp = {
+                    id: -1,
+                    nombre: "",
+                    apellido: "",
+                    cedula: "",
+                    correo: "",
+                    pais: "",
+                    postalcode: "",
+                    telefono: "",
+                    monto: 0
+                }; 
             }
         },
         addContent( type, data, id ) {

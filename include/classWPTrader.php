@@ -189,12 +189,12 @@ class WP_Trader {
 
     public static function create_menu(){
         add_menu_page(
-            'My Plugin',
-            'My Plugin',
+            'WP Trader Club',
+            'WP Trader Club',
             'manage_options',
             WP_PLUGIN_DIR.'/wp-trader/admin/view/all.php',
             null,
-            'dashicons-admin-generic',
+            'https://api.iconify.design/ic/round-currency-exchange.svg?color=white',
             5
         );
     }
