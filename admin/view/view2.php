@@ -30,6 +30,7 @@
                                     v-model="newRate.rate"
                                     min="0"
                                     max="100"
+                                    step="0.01"
                                     append-icon="mdi-percent"
                                 ></v-text-field>
                                 <span v-else>{{item.rate}}<v-icon>mdi-percent</v-icon></span>

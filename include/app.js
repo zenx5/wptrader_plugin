@@ -93,22 +93,35 @@ let app = new Vue({
     },
     filters: {
         date: value => {
-            let valueArray = value.split("-");
-            if( valueArray[0].length > 2 ){
-                aux = valueArray[0];
-                valueArray[0] = parseInt( valueArray[1] ) - 1;
-                valueArray[1] = valueArray[2];
-                valueArray[2] = aux;
+            if( value ) {
+                let valueArray = value.split("-");
+                if( valueArray[0].length > 2 ){
+                    aux = valueArray[0];
+                    valueArray[0] = parseInt( valueArray[1] ) - 1;
+                    valueArray[1] = valueArray[2];
+                    valueArray[2] = aux;
+                }
+                return [
+                    "Enero", "Febrero", "Marzo",
+                    "Abril", "Mayo", "Junio",
+                    "julio", "Agosto", "Septiembre",
+                    "Octubre", "Noviembre", "Diciembre",
+                ][ parseInt( valueArray[0] ) ]+", "+valueArray[1]+" del "+valueArray[2];
             }
-            return [
-                "Enero", "Febrero", "Marzo",
-                "Abril", "Mayo", "Junio",
-                "julio", "Agosto", "Septiembre",
-                "Octubre", "Noviembre", "Diciembre",
-            ][ parseInt( valueArray[0] ) ]+", "+valueArray[1]+" del "+valueArray[2];
         }, 
         forKey: (elements, key, id) => {
             return elements.filter( element => element[ key ] == id );
+        },
+        fechaCobro: (elements,tiempo) => {
+            return elements.filter( (element, index) => {
+                let hoyms = (new Date()).getTime();
+                let fechams = (new Date( element.fecha )).getTime();
+                let fechacobroms = fechams + tiempo*1000*60*60*24;
+                let fechacobro = new Date( fechacobroms );
+                elements[ index ].fechacobro = (fechacobro.getMonth() + 1)+"-"+fechacobro.getDate()+"-"+fechacobro.getFullYear();
+                elements[ index ].cobro = parseInt( ( fechacobroms - hoyms )/1000/60/60/24 );
+                return true;
+            })
         }
     },
     methods: {
@@ -155,20 +168,7 @@ let app = new Vue({
                 this.details = index;
                 this.temp = this.users[index]
                 this.tab = 2;
-                this.investments = $t.getInvestments( this.users[ index ].id );
-                this.investments.forEach(
-                    ( investment, $index ) =>
-                    {
-                        let hoyms = (new Date()).getTime();
-                        let fechams = (new Date( investment.fecha )).getTime();
-                        let fechacobroms = fechams + this.tiempoCobro*1000*60*60*24;
-                        let fechacobro = new Date( fechacobroms );
-                        this.investments[ $index ].fechacobro = (fechacobro.getMonth() + 1)+"-"+fechacobro.getDate()+"-"+fechacobro.getFullYear();
-                        this.investments[ $index ].cobro = parseInt( ( fechacobroms - hoyms )/1000/60/60/24 );
-
-                    }
-                )
-            }else{ 
+            }else{
                 this.details = -1;
                 this.tab = 0;
             }
@@ -188,6 +188,17 @@ let app = new Vue({
                     }else{
                         this.users.push( data );
                     }
+                    this.temp = {
+                        id: -1,
+                        nombre: "",
+                        apellido: "",
+                        cedula: "",
+                        correo: "",
+                        pais: "",
+                        postalcode: "",
+                        telefono: "",
+                        monto: 0
+                    };
                     break;
                 case 'wpt_rates': 
                     if( id != -1 ){
@@ -202,9 +213,20 @@ let app = new Vue({
                     }else{
                         this.rates.push( data );
                     }
+                    this.newRate = {
+                        id: -1,
+                        color: "#fff",
+                        rate: 0,
+                        investmin: 0,
+                        investmax: 0
+                    }
                     break;
                 case 'wpt_investments':
                     this.investments.push( data )
+                    this.newInvesment = {
+                        fecha: '',
+                        monto: 0
+                    }
             }
         },
         content( type ){
@@ -256,28 +278,8 @@ let app = new Vue({
                 this.addContent( type, data, $index );
             }
             this.editRow = -1;
-            this.temp = {
-                id: -1,
-                nombre: "",
-                apellido: "",
-                cedula: "",
-                correo: "",
-                pais: "",
-                postalcode: "",
-                telefono: "",
-                monto: 0
-            };
-            this.newRate = {
-                id: -1,
-                color: "#fff",
-                rate: 0,
-                investmin: 0,
-                investmax: 0
-            }
-            this.newInvesment = {
-                fecha: '',
-                monto: 0
-            }
+            
+            
             this.render = ! this.render;
         },
         async del(type, $index) {

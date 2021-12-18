@@ -22,6 +22,9 @@
     #wp-trader-app .v-input--is-disabled input, #wp-trader-app .v-input--is-disabled .v-select__selection{
         color: rgba(0,0,0,70%) !important;
     }
+    #wp-trader-app input[type="color"]{
+        padding: 0px;
+    }
     #wp-trader-app input[type="number"]{
         text-align: right;
     }
