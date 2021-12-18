@@ -90,9 +90,33 @@ class WP_Trader {
         add_action( 'wp_ajax_wpt_delete_data', array('WP_Trader', 'wpt_delete_data') );
         //add_action( 'wp_ajax_wpt_edit_data', array('WP_Trader', 'wpt_edit_data') );
         add_shortcode( 'wpt_user_name', array('WP_Trader', 'shortcode_user_name' ) );
+        add_shortcode( 'wpt_count_down', array('WP_Trader', 'shortcode_count_down' ) );
         self::$settings['wpt_users'] = get_option('wpt_users');
         self::$settings['wpt_investments'] = get_option('wpt_investments');
 
+    }
+
+    public static function shortcode_count_down($atts,$content ){
+        $users = json_decode( get_option('wpt_users'), true);
+        
+        foreach( $users as $user ) {
+            if( $user['wpid'] == $atts['id'] ) {
+                
+            }
+        }
+        $html = "<div class='main-count-down'>";
+        $html .= "<div class='box-count-down'>";
+        $html .= "<span class='item-count-down item-day-count-down'>";
+        $html .= "</span>";
+        $html .= "<span class='item-count-down item-hour-count-down'>";
+        $html .= "</span>";
+        $html .= "<span class='item-count-down item-hour-count-down'>";
+        $html .= "</span>";
+        $html .= "<span class='item-count-down item-hour-count-down'>";
+        $html .= "</span>";
+        $html .= "</div>";
+        $html .= "</div>";
+        return $html;
     }
 
     public static function shortcode_user_name($atts,$content ){
@@ -103,8 +127,7 @@ class WP_Trader {
                 return $user['nombre']." ".$user['apellido'];
             }
         }
-        return "Usuario no existe";
-        
+        return "Usuario no existe";   
     }
 
     public static function javascript_ajax(){
