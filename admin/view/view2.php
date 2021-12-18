@@ -66,12 +66,15 @@
                 <v-divider/></v-divider>
                 
                 <v-row>
-                    <v-col>
+                    <v-col cols="5">
                         <h3>Configuraciones generales</h3>
+                    </v-col>
+                    <v-col cols="5">
+                        <h3>Paises</h3>
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col cols="5">
+                    <v-col cols="2">
                         <v-text-field 
                             type="number"
                             min="0"
@@ -80,7 +83,9 @@
                             append-icon="mdi-currency-usd"
                         ></v-text-field>
                     </v-col>
-                    <v-col cols="5">
+                </v-row>
+                <v-row>
+                    <v-col cols="2">
                         <v-text-field 
                             type="number"
                             min="0"

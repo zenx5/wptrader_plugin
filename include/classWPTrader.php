@@ -28,6 +28,7 @@ class WP_Trader {
          */
         'wpt_investments' => [],
         'wpt_users' => [],
+        'wpt_settings' => [],
         'wpt_user_fields' => [ 
             "monto" => "Monto",
             "telefono" => "Telefono",
@@ -60,6 +61,7 @@ class WP_Trader {
             'plugin_active' => false,
             'wpt_rates' => [],
             'wpt_investments' => [],
+            'wpt_settings' => [],
             'wpt_users' => [],
             'wpt_user_fields' => [ 
                 "monto" => "Monto",
@@ -93,6 +95,7 @@ class WP_Trader {
         add_shortcode( 'wpt_count_down', array('WP_Trader', 'shortcode_count_down' ) );
         self::$settings['wpt_users'] = get_option('wpt_users');
         self::$settings['wpt_investments'] = get_option('wpt_investments');
+        self::$settings['wpt_settings'] = get_option('wpt_settings');
 
     }
 
@@ -189,12 +192,12 @@ class WP_Trader {
 
     public static function create_menu(){
         add_menu_page(
-            'My Plugin',
-            'My Plugin',
+            'WP Trader Club',
+            'WP Trader Club',
             'manage_options',
             WP_PLUGIN_DIR.'/wp-trader/admin/view/all.php',
             null,
-            'dashicons-admin-generic',
+            'https://api.iconify.design/ic/round-currency-exchange.svg?color=white',
             5
         );
     }
@@ -202,6 +205,11 @@ class WP_Trader {
         self::update_settings('wpt_rates', array() );
         self::update_settings('wpt_users', array() );
         self::update_settings('wpt_investments', array() );
+        self::update_settings('wpt_settings', array(
+            "tiempoCobro" => 180,
+            "rmin" => 30,
+            "contrySelect" => ["all"]
+        ) );
         self::update_settings('wpt_user_fields', self::$settings['wpt_user_fields'] );
         self::update_settings('db_created', true);
     }
@@ -231,6 +239,7 @@ class WP_Trader {
             // Obtenemos los usuarios de worpress y le aplicamos JSON.parse para convertirlo de string a object
             let $userswp = JSON.parse('<?= json_encode( get_users('role=subscriber') ); ?>')
             let $t = new WPTrader(<?=self::get('wpt_user_fields',false)?>,<?=self::get('wpt_users', false)?>,<?=self::get('wpt_investments',false)?>,<?=self::get('wpt_rates',false)?>);
+            $t.setSettings(<?=self::get('wpt_settings',false)?>)
             </script>
         <?php
     }
