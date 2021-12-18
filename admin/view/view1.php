@@ -122,7 +122,7 @@
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col col="3">
+                    <v-col cols="3">
                         <v-select
                             :items="countries"
                             item-text="label"
@@ -131,22 +131,34 @@
                             v-model="temp.pais">
                         </v-select>
                     </v-col>
-                    <v-col col="3">
+                    <v-col cols="2">
                         <v-text-field
                             label="Codigo Postal"
                             v-model="temp.postalcode"
                             counter>
                         </v-text-field>
                     </v-col>
-                    <v-col col="3">
+                    <v-col cols="2">
                         <v-text-field
                             label="Telefono"
                             v-model="temp.telefono"
                             counter>
                         </v-text-field>
                     </v-col>
-                    <v-col col="3">
-                        <v-btn @click="save('wpt_users',-1)">
+                    <v-col>
+                        <v-select
+                            :items="$userswp"
+                            item-text="data.display_name"
+                            item-value="data"
+                            filled
+                            label="usuario worpress"
+                        >
+                        </v-select>
+                    </v-col>
+                    <v-col>
+                        <v-btn 
+                            @click="save('wpt_users',-1)"
+                            style="margin-top: 10px">
                             <v-icon>mdi-content-save</v-icon>Guardar
                         </v-btn>
                     </v-col>

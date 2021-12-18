@@ -205,6 +205,8 @@ class WP_Trader {
                 include "countries.js";
                 include "classwpt.js";
             ?>
+            // Obtenemos los usuarios de worpress y le aplicamos JSON.parse para convertirlo de string a object
+            let $userswp = JSON.parse('<?= json_encode( get_users('role=subscriber') ); ?>')
             let $t = new WPTrader(<?=self::get('wpt_user_fields',false)?>,<?=self::get('wpt_users', false)?>,<?=self::get('wpt_investments',false)?>,<?=self::get('wpt_rates',false)?>);
             </script>
         <?php
