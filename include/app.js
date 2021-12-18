@@ -8,11 +8,14 @@ let app = new Vue({
             tab: 0,
             tiempoCobro: 180,
             rmin: 30,
-            contrySelect: ["all"]
+            contrySelect: ["all"],
             details: -1,
             editRow: -1,
             tabs: ["Dashboard", "Settings", "Details"],
             title: "Title of the Dashboard",
+            headerCountrie: [
+                { text: "Label" , value: "label", align: "center" },
+            ],
             headerInvesment: [
                 { text: "Fecha de Inicio" , value: "fecha", align: "center" },
                 { text: "Fecha de Cobro" , value: "fechacobro", align: "center" },

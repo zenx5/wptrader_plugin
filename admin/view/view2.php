@@ -74,31 +74,48 @@
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col cols="2">
-                        <v-text-field 
-                            type="number"
-                            min="0"
-                            label="Retiro Mínimo"
-                            v-model="rmin"
-                            append-icon="mdi-currency-usd"
-                        ></v-text-field>
+                    <v-col cols="5">
+                        <v-row>
+                            <v-col>
+                                <v-text-field 
+                                    type="number"
+                                    min="0"
+                                    label="Retiro Mínimo"
+                                    v-model="rmin"
+                                    append-icon="mdi-currency-usd"
+                                ></v-text-field>
+                            </v-col>
+                            <v-col> 
+                                <v-btn
+                                    style="color: black; margin-top: 10px"
+                                > Reset </v-btn>
+                            </v-col>
+                        </v-row>
+                        <v-row>
+                            <v-col>
+                                <v-text-field 
+                                    type="number"
+                                    min="0"
+                                    label="Plazo para Cobro"
+                                    v-model="tiempoCobro"
+                                    suffix="dias"
+                                ></v-text-field>
+                            </v-col>
+                            <v-col> 
+                                <v-btn
+                                    style="color: black; margin-top: 10px"
+                                > Enviar </v-btn>
+                            </v-col>
+                        </v-row>
                     </v-col>
-                </v-row>
-                <v-row>
-                    <v-col cols="2">
-                        <v-text-field 
-                            type="number"
-                            min="0"
-                            label="Plazo para Cobro"
-                            v-model="tiempoCobro"
-                            suffix="dias"
-                        ></v-text-field>
+                    <v-col>
+                        <v-data-table
+                            :headers="headerCountrie"
+                            :items="countries"
+                            show-select
+                            class="elevation-1"
+                        ></v-data-table>
                     </v-col>
-                    <v-col> 
-                        <v-btn
-                            style="color: black; margin-top: 10px"
-                        > Enviar </v-btn>
-                    </v-cols>
                 </v-row>
             </v-container>
         </v-form>
