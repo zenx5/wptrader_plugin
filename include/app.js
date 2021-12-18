@@ -8,6 +8,7 @@ let app = new Vue({
             tab: 0,
             tiempoCobro: 180,
             rmin: 30,
+            contrySelect: ["all"]
             details: -1,
             editRow: -1,
             tabs: ["Dashboard", "Settings", "Details"],
@@ -89,6 +90,9 @@ let app = new Vue({
         this.rates = $t.rates;
         this.investments = $t.investments;
         this.rates.unshift(this.newRate)
+        this.rmin = $t.settings.rmin;
+        this.tiempoCobro = $t.settings.tiempoCobro;
+        this.contrySelect = $t.settings.contrySelect;
         await this.getData();
     },
     filters: {

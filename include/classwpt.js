@@ -12,7 +12,9 @@ class WPTrader {
         )
     }
 
-    
+    setSettings(settings) {
+        this.settings = settings;
+    }
     getUser(id) {
         return this.users.filter( user => user.id == id );
     }
