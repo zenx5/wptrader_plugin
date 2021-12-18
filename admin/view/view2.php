@@ -63,7 +63,7 @@
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col cols="6">
+                    <v-col cols="5">
                         <v-text-field 
                             type="number"
                             min="0"
@@ -71,7 +71,7 @@
                         >
                         </v-text-field>
                     </v-col>
-                    <v-col cols="6">
+                    <v-col cols="5">
                         <v-text-field 
                             type="number"
                             min="0"
@@ -79,6 +79,11 @@
                         >
                         </v-text-field>
                     </v-col>
+                    <v-col> 
+                        <v-btn
+                            style="color: black; margin-top: 10px"
+                        > Enviar </v-btn>
+                    </v-cols>
                 </v-row>
             </v-container>
         </v-form>
