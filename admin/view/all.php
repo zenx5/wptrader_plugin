@@ -13,13 +13,20 @@
         margin-left: 20px;
         margin-right: 20px;
     }
-    #wp-trader-app .v-input input:focus, .v-input input:active{
+    #wp-trader-app .v-input,#wp-trader-app input:focus,#wp-trader-app .v-input input:active,
+    #wp-trader-app input{
         border: none !important;
         box-shadow: none !important;
     }
 
     #wp-trader-app .v-input--is-disabled input, #wp-trader-app .v-input--is-disabled .v-select__selection{
         color: rgba(0,0,0,70%) !important;
+    }
+    #wp-trader-app input[type="color"]{
+        padding: 0px;
+    }
+    #wp-trader-app input[type="number"]{
+        text-align: right;
     }
 </style>
 <div class="trader-app-container">

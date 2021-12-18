@@ -28,24 +28,32 @@
                                     type="number" 
                                     v-if="index==0" 
                                     v-model="newRate.rate"
-                                    min="0"></v-text-field>
-                                <span v-else>{{item.rate}}</span>
+                                    min="0"
+                                    max="100"
+                                    step="0.01"
+                                    append-icon="mdi-percent"
+                                ></v-text-field>
+                                <span v-else>{{item.rate}}<v-icon>mdi-percent</v-icon></span>
                             </template>
                             <template #item.investmin="{item, index}">
                                 <v-text-field 
                                     type="number" 
                                     v-if="index==0" 
                                     v-model="newRate.investmin"
-                                    min="0"></v-text-field>
-                                <span v-else>{{item.investmin}}</span>
+                                    min="0"
+                                    append-icon="mdi-currency-usd"
+                                ></v-text-field>
+                                <span v-else>{{item.investmin}}<v-icon>mdi-currency-usd</v-icon></span>
                             </template>
                             <template #item.investmax="{item, index}">
                                 <v-text-field 
                                     v-if="index==0"
                                     type="number"
                                     v-model="newRate.investmax"
-                                    min="0"></v-text-field>
-                                <span v-else>{{item.investmax}}</span>
+                                    min="0"
+                                    append-icon="mdi-currency-usd"
+                                ></v-text-field>
+                                <span v-else>{{item.investmax}}<v-icon>mdi-currency-usd</v-icon></span>
                             </template>
                             <template #item.action="{item, index}">
                                 <v-icon v-if="index==0" @click="save('wpt_rates',-1)">mdi-content-save</v-icon>
@@ -63,22 +71,29 @@
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col cols="6">
+                    <v-col cols="5">
                         <v-text-field 
                             type="number"
                             min="0"
+                            label="Retiro Mínimo"
                             v-model="rmin"
-                        >
-                        </v-text-field>
+                            append-icon="mdi-currency-usd"
+                        ></v-text-field>
                     </v-col>
-                    <v-col cols="6">
+                    <v-col cols="5">
                         <v-text-field 
                             type="number"
                             min="0"
-                            v-model="plazo"
-                        >
-                        </v-text-field>
+                            label="Plazo para Cobro"
+                            v-model="tiempoCobro"
+                            suffix="dias"
+                        ></v-text-field>
                     </v-col>
+                    <v-col> 
+                        <v-btn
+                            style="color: black; margin-top: 10px"
+                        > Enviar </v-btn>
+                    </v-cols>
                 </v-row>
             </v-container>
         </v-form>
