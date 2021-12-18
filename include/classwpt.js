@@ -4,6 +4,12 @@ class WPTrader {
         this.users = users;
         this.rates = rates;
         this.investments = investments;
+        this.investments.forEach( 
+            ( element, index ) => 
+            {
+                this.investments[index].monto = parseFloat( element.monto )
+            }
+        )
     }
 
     
