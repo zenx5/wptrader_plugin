@@ -86,7 +86,7 @@
                             min="0"
                             label="Plazo para Cobro"
                             v-model="tiempoCobro"
-                            append-icon="mdi-currency-usd"
+                            suffix="dias"
                         ></v-text-field>
                     </v-col>
                     <v-col> 
