@@ -107,18 +107,89 @@ class WP_Trader {
                 
             }
         }
-        $html = "<div class='main-count-down'>";
-        $html .= "<div class='box-count-down'>";
-        $html .= "<span class='item-count-down item-day-count-down'>";
-        $html .= "</span>";
-        $html .= "<span class='item-count-down item-hour-count-down'>";
-        $html .= "</span>";
-        $html .= "<span class='item-count-down item-hour-count-down'>";
-        $html .= "</span>";
-        $html .= "<span class='item-count-down item-hour-count-down'>";
-        $html .= "</span>";
-        $html .= "</div>";
-        $html .= "</div>";
+        ob_start();
+        ?>
+            <script type="text/javascript">
+                // Create a class for the element
+                class CountDown extends HTMLElement {
+                constructor() {
+                    // Always call super first in constructor
+                    super();
+
+                    // Create a shadow root
+                    const shadow = this.attachShadow({mode: 'open'});
+
+                    // Create spans
+                    const box = document.createElement('span');
+                    box.setAttribute('class', 'cd-wrapper');
+
+
+                    const day = document.createElement('span');
+                    day.setAttribute('class', 'cd-box');
+                    day.textContent = 10;
+
+                    const hour = document.createElement('span');
+                    hour.setAttribute('class', 'cd-box');
+                    hour.textContent = 0;
+
+                    const minute = document.createElement('span');
+                    minute.setAttribute('class', 'cd-box');
+                    minute.textContent = 0;
+
+                    const second = document.createElement('span');
+                    second.setAttribute('class', 'cd-box');
+                    second.textContent = 0;
+                    
+
+                    const style = document.createElement('style');
+                    
+
+                    style.textContent = `
+                    .cd-wrapper {
+                        display: flex;
+                        flex-direction: row;
+                        justify-content: space-around;
+                    }
+
+                    .cd-box {
+                        width: 90px;
+                        font-size: 50px;
+                        text-align: center;
+                        box-shadow: 0px 0px 10px rgb(0 0 0 / 30%);
+                        border-radius: 10px;                        
+                    }
+                    .cd-box::after {
+                        
+                    }
+                    `;
+
+                    // Attach the created elements to the shadow dom
+                    shadow.appendChild(style);
+                    
+                    shadow.appendChild(box);
+                    box.appendChild(day);
+                    box.appendChild(hour);
+                    box.appendChild(minute);
+                    box.appendChild(second);
+                }
+                }
+
+                // Define the new element
+                customElements.define('count-down', CountDown);
+                
+            </script>
+            
+            <count-down
+                data-day="10"
+                data-hour="0"
+                data-minute="0"
+                data-second="0"
+            ></count-down>
+            
+
+        <?php
+        $html = ob_get_contents();
+        ob_end_clean();
         return $html;
     }
 
