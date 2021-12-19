@@ -112,9 +112,16 @@
                         <v-data-table
                             :headers="headerCountrie"
                             :items="countries"
-                            show-select
                             class="elevation-1"
-                        ></v-data-table>
+                        >
+                        <template #item.enable="{item}">
+                            <v-checkbox
+                                v-model="item.enable"
+                                class="pa-3"
+                                @click="localStorage.setItem('wpt_countries', JSON.stringify(countries))"
+                            ></v-checkbox>
+                        </template>
+                    </v-data-table>
                     </v-col>
                 </v-row>
             </v-container>

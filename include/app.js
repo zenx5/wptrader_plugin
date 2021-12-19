@@ -8,13 +8,13 @@ let app = new Vue({
             tab: 0,
             tiempoCobro: 180,
             rmin: 30,
-            contrySelect: ["all"],
             details: -1,
             editRow: -1,
             tabs: ["Dashboard", "Settings", "Details"],
             title: "Title of the Dashboard",
             headerCountrie: [
                 { text: "Label" , value: "label", align: "center" },
+                { text: "Enable" , value: "enable", align: "center" },
             ],
             headerInvesment: [
                 { text: "Fecha de Inicio" , value: "fecha", align: "center" },
@@ -81,21 +81,25 @@ let app = new Vue({
         )
         
         this.countries = JSON.parse( localStorage.getItem("wpt_countries") ) || [];
+        
         this.countries.forEach( 
             ( country, $index ) => {
                 this.countries[$index].label = country.name.common
+                if( country.enable == undefined ) {
+                    this.countries[$index].enable = true;
+                }
             }
         )
-        this.countries = this.countries.filter( country => {
-            return country.enable
-        } )
+
+        localStorage.setItem("wpt_countries", JSON.stringify( this.countries ) ) 
+        
         this.users = $t.users;
         this.rates = $t.rates;
         this.investments = $t.investments;
         this.rates.unshift(this.newRate)
         this.rmin = $t.settings.rmin;
         this.tiempoCobro = $t.settings.tiempoCobro;
-        this.contrySelect = $t.settings.contrySelect;
+        this.countrySelect = $t.settings.countrySelect;
         await this.getData();
     },
     filters: {

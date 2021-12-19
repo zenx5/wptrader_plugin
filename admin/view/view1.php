@@ -42,7 +42,7 @@
                         </template>
                         <template #item.pais="{item, index}">
                             <v-select
-                                :items="countries"
+                                :items="countries | forKey('enable', 1)"
                                 item-text="label"
                                 item-value="label"
                                 label="Country"
@@ -124,7 +124,7 @@
                 <v-row>
                     <v-col cols="3">
                         <v-select
-                            :items="countries"
+                            :items="countries | forKey('enable', 1)"
                             item-text="label"
                             item-value="label"
                             label="Pais"
