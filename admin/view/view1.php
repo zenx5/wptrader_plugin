@@ -150,6 +150,7 @@
                             :items="$userswp"
                             item-text="data.display_name"
                             item-value="data.ID"
+                            v-model="temp.wpid"
                             label="Usuario WordPress"
                         >
                         </v-select>

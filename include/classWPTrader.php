@@ -99,79 +99,176 @@ class WP_Trader {
 
     }
 
-    public static function shortcode_count_down($atts,$content ){
-        $users = json_decode( get_option('wpt_users'), true);
-        
-        foreach( $users as $user ) {
-            if( $user['wpid'] == $atts['id'] ) {
-                
+    public static function get_time($id) {        
+        $invesments = json_decode( get_option('wpt_investments'), true );
+        foreach( $invesments as $invesment ) {
+            if( $invesment['usuario'] == $id ) {
+                $end = date_create( $invesment['fecha'] );
+                $end->add( new DateInterval('P180D') );
+                return date_diff( $end, date_create() );
             }
         }
+    }
+
+    public static function shortcode_count_down($atts,$content ){
+        
+        $users = json_decode( get_option('wpt_users'), true);
+        
+        $day = 0;
+        $hour = 0;
+        $minute = 0;
+        $second = 0;
+        $id = isset( $atts['id'] )?$atts['id']:get_current_user_id();
+        
+        foreach( $users as $user ) {
+            if( $user['wpid'] == $id ) {
+                $diff = self::get_time($user['id']);
+            }
+        }
+        $day = $diff->days;
+        $hour = $diff->h;
+        $minute = $diff->i;
+        $second = $diff->s;
+
         ob_start();
         ?>
             <script type="text/javascript">
                 // Create a class for the element
                 class CountDown extends HTMLElement {
-                constructor() {
-                    // Always call super first in constructor
-                    super();
+                    constructor() {
+                        // Always call super first in constructor
+                        super();
 
-                    // Create a shadow root
-                    const shadow = this.attachShadow({mode: 'open'});
+                        this.elements = {
+                            day: null,
+                            hour: null,
+                            minute: null, 
+                            second: null
+                        };
+                        // Create a shadow root
+                        const shadow = this.attachShadow({mode: 'open'});
 
-                    // Create spans
-                    const box = document.createElement('span');
-                    box.setAttribute('class', 'cd-wrapper');
+                        // Create spans
+                        const box = document.createElement('span');
+                        box.setAttribute('class', 'cd-wrapper');
+                        this.box = box;
 
 
-                    const day = document.createElement('span');
-                    day.setAttribute('class', 'cd-box');
-                    day.textContent = 10;
+                        const day = document.createElement('span');
+                        day.setAttribute('class', 'cd-box');
+                        this.day = 0;
+                        day.textContent = this.day;
+                        this.elements.day = day;
 
-                    const hour = document.createElement('span');
-                    hour.setAttribute('class', 'cd-box');
-                    hour.textContent = 0;
+                        const hour = document.createElement('span');
+                        hour.setAttribute('class', 'cd-box');
+                        this.hour = 0;
+                        hour.textContent = this.hour;
+                        this.elements.hour = hour;
 
-                    const minute = document.createElement('span');
-                    minute.setAttribute('class', 'cd-box');
-                    minute.textContent = 0;
+                        const minute = document.createElement('span');
+                        minute.setAttribute('class', 'cd-box');
+                        this.minute = 0;
+                        minute.textContent = this.minute;
+                        this.elements.minute = minute;
 
-                    const second = document.createElement('span');
-                    second.setAttribute('class', 'cd-box');
-                    second.textContent = 0;
-                    
-
-                    const style = document.createElement('style');
-                    
-
-                    style.textContent = `
-                    .cd-wrapper {
-                        display: flex;
-                        flex-direction: row;
-                        justify-content: space-around;
-                    }
-
-                    .cd-box {
-                        width: 90px;
-                        font-size: 50px;
-                        text-align: center;
-                        box-shadow: 0px 0px 10px rgb(0 0 0 / 30%);
-                        border-radius: 10px;                        
-                    }
-                    .cd-box::after {
+                        const second = document.createElement('span');
+                        second.setAttribute('class', 'cd-box');
+                        this.second = 0;
+                        second.textContent = this.second;
+                        this.elements.second = second;
                         
-                    }
-                    `;
+                        const style = document.createElement('style');
+                        
+                        style.textContent = `
+                        .cd-message {
+                            display: flex;
+                            flex-direction: row;
+                            justify-content: center;
+                            font-weight: bold;
+                            font-size: 120%;
+                        }
+                        .cd-wrapper {
+                            display: flex;
+                            flex-direction: row;
+                            justify-content: space-around;
+                        }
 
-                    // Attach the created elements to the shadow dom
-                    shadow.appendChild(style);
-                    
-                    shadow.appendChild(box);
-                    box.appendChild(day);
-                    box.appendChild(hour);
-                    box.appendChild(minute);
-                    box.appendChild(second);
-                }
+                        .cd-box {
+                            width: 90px;
+                            font-size: 50px;
+                            text-align: center;
+                            box-shadow: 0px 0px 10px rgb(0 0 0 / 30%);
+                            border-radius: 10px;                        
+                        }
+                        .cd-box::after {
+                            
+                        }
+                        `;
+
+                        this.target = false;
+                        this.loaded = false;
+
+                        // Attach the created elements to the shadow dom
+                        shadow.appendChild(style);
+                        
+                        shadow.appendChild(box);
+                        box.appendChild(day);
+                        box.appendChild(hour);
+                        box.appendChild(minute);
+                        box.appendChild(second);
+                        this.idInterval = setInterval( _ => {
+                            this.load();
+                            this.tick();
+                            this.render();
+                            if( this.target ) {
+                                clearInterval( this.idInterval );
+                                this.box.textContent = this.message;
+                                this.box.setAttribute("class", "cd-message")
+                            }
+                        }, 1000 );
+                    }
+
+                    load() {
+                        if( ! this.loaded ) {   
+                            this.day = this.getAttribute("data-day") || 0;
+                            this.hour = this.getAttribute("data-hour") || 0;
+                            this.minute = this.getAttribute("data-minute") || 0;
+                            this.second = this.getAttribute("data-second") || 0;
+                            this.message = this.getAttribute("data-message") || 0;
+                            this.loaded = true;
+                        }
+                    }
+
+                    render() {
+                        this.elements.day.textContent = this.day;
+                        this.elements.hour.textContent = this.hour;
+                        this.elements.minute.textContent = this.minute;
+                        this.elements.second.textContent = this.second;
+                    }
+
+                    tick() {
+                        this.second--;
+                        if( this.second < 0 ) {
+                            this.second = 59;
+                            this.minute--;
+                            if( this.minute < 0 ) {
+                                this.minute = 59;
+                                this.hour--;
+                                if( this.hour < 0 ) {
+                                    this.hour = 23;
+                                    this.day--;
+                                    if( this.day < 0 ) {
+                                        this.day = 0;
+                                        this.hour = 0;
+                                        this.minute = 0;
+                                        this.second = 0;
+                                        this.target = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
 
                 // Define the new element
@@ -180,14 +277,14 @@ class WP_Trader {
             </script>
             
             <count-down
-                data-day="10"
-                data-hour="0"
-                data-minute="0"
-                data-second="0"
+                data-day="<?=$day?>"
+                data-hour="<?=$hour?>"
+                data-minute="<?=$minute?>"
+                data-second="<?=$second?>"
+                data-message="Su suscripcion ha expirado"
             ></count-down>
-            
-
         <?php
+        
         $html = ob_get_contents();
         ob_end_clean();
         return $html;

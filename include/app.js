@@ -191,7 +191,8 @@ let app = new Vue({
                     pais: "",
                     postalcode: "",
                     telefono: "",
-                    monto: 0
+                    monto: 0,
+                    wpid: -1
                 }; 
             }
         },
@@ -219,7 +220,8 @@ let app = new Vue({
                         pais: "",
                         postalcode: "",
                         telefono: "",
-                        monto: 0
+                        monto: 0,
+                        wpid: -1
                     };
                     break;
                 case 'wpt_rates': 
@@ -335,7 +337,8 @@ let app = new Vue({
                 pais: "",
                 postalcode: "",
                 telefono: "",
-                monto: 0
+                monto: 0,
+                wpid: -1,
             };
             this.newRate = {
                 id: -1,
