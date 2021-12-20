@@ -38,7 +38,7 @@ class WP_Trader {
             "cedula" => "Cedula",
             "apellido" => "Apellido",
             "nombre" => "Nombre",
-            "id" => "ID"
+            "id" => "ID/wp_id"
         ]
     ];
 
@@ -72,7 +72,7 @@ class WP_Trader {
                 "cedula" => "Cedula",
                 "apellido" => "Apellido",
                 "nombre" => "Nombre",
-                "id" => "ID"
+                "id" => "ID/wp_id"
             ]
         ];
         foreach( $defaultSettings as $key => $value ) {
@@ -93,11 +93,33 @@ class WP_Trader {
         //add_action( 'wp_ajax_wpt_edit_data', array('WP_Trader', 'wpt_edit_data') );
         add_shortcode( 'wpt_user_name', array('WP_Trader', 'shortcode_user_name' ) );
         add_shortcode( 'wpt_count_down', array('WP_Trader', 'shortcode_count_down' ) );
+        add_shortcode( 'wpt_get_data', array('WP_Trader', 'shortcode_get_data' ) );
         self::$settings['wpt_users'] = get_option('wpt_users');
         self::$settings['wpt_investments'] = get_option('wpt_investments');
         self::$settings['wpt_settings'] = get_option('wpt_settings');
 
     }
+
+    public static function shortcode_get_data( $atts, $content ) {
+        $id = isset( $atts['id'] )?$atts['id']:get_current_user_id();
+        if ( !isset( $atts['field'] ) ) {
+            return "campo no especificado";
+        };
+        
+        $users = json_decode( get_option('wpt_users'), true);
+        
+        foreach( $users as $user ) {
+            if( $user['id'] == $atts['id'] ) {
+                if ( !isset($user[$atts['field']]) ) {
+                    return "campo no existente";
+                };
+                return $user[$atts['field']];
+            }
+        }
+        return 'usuario no existente';
+    }
+
+
 
     public static function get_time($id) {        
         $invesments = json_decode( get_option('wpt_investments'), true );
@@ -294,7 +316,7 @@ class WP_Trader {
         $users = json_decode( get_option('wpt_users'), true);
         
         foreach( $users as $user ) {
-            if( $user['wpid'] == $atts['id'] ) {
+            if( $user['id'] == $atts['id'] ) {
                 return $user['nombre']." ".$user['apellido'];
             }
         }
