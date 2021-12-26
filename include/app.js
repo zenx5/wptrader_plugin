@@ -309,9 +309,7 @@ let app = new Vue({
             }
             const { data } = await axios.post(ajaxurl, dataSend);
             if( data ) {
-                if( type != 'wpt_settings ') {
-                    this.addContent( type, data, $index );
-                }
+                this.addContent( type, data, $index );
             }
             this.editRow = -1;
             

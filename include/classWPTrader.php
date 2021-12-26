@@ -361,7 +361,7 @@ class WP_Trader {
             }
         }        
         update_option($target, json_encode( $content ) );
-        echo json_encode( $content );
+        echo json_encode( $value );
         wp_die();
     }
 
