@@ -6,13 +6,18 @@ let app = new Vue({
         return {
             render: false,
             tab: 0,
-            tiempoCobro: 180,
-            rmin: 30,
-            contrySelect: ["all"]
+            settings: {
+                tiempoCobro: 180,
+                rmin: 30
+            },            
             details: -1,
             editRow: -1,
             tabs: ["Dashboard", "Settings", "Details"],
             title: "Title of the Dashboard",
+            headerCountrie: [
+                { text: "Label" , value: "label", align: "center" },
+                { text: "Enable" , value: "enable", align: "center" },
+            ],
             headerInvesment: [
                 { text: "Fecha de Inicio" , value: "fecha", align: "center" },
                 { text: "Fecha de Cobro" , value: "fechacobro", align: "center" },
@@ -78,21 +83,27 @@ let app = new Vue({
         )
         
         this.countries = JSON.parse( localStorage.getItem("wpt_countries") ) || [];
+        
         this.countries.forEach( 
             ( country, $index ) => {
                 this.countries[$index].label = country.name.common
+                if( country.enable == undefined ) {
+                    this.countries[$index].enable = true;
+                }
             }
         )
-        this.countries = this.countries.filter( country => {
-            return country.enable
-        } )
+
+        localStorage.setItem("wpt_countries", JSON.stringify( this.countries ) ) 
+        
         this.users = $t.users;
         this.rates = $t.rates;
         this.investments = $t.investments;
         this.rates.unshift(this.newRate)
-        this.rmin = $t.settings.rmin;
+        this.settings = $t.settings[0];
+        console.log(this.settings)
+        /*this.rmin = $t.settings.rmin;
         this.tiempoCobro = $t.settings.tiempoCobro;
-        this.contrySelect = $t.settings.contrySelect;
+        this.countrySelect = $t.settings.countrySelect;*/
         await this.getData();
     },
     filters: {
@@ -129,6 +140,11 @@ let app = new Vue({
         }
     },
     methods: {
+        reset() {
+            this.settings.rmin = 30;
+            this.settings.tiempoCobro = 180;
+
+        },
         cobrar(){
 
         },
@@ -184,7 +200,8 @@ let app = new Vue({
                     pais: "",
                     postalcode: "",
                     telefono: "",
-                    monto: 0
+                    monto: 0,
+                    wpid: -1
                 }; 
             }
         },
@@ -212,7 +229,8 @@ let app = new Vue({
                         pais: "",
                         postalcode: "",
                         telefono: "",
-                        monto: 0
+                        monto: 0,
+                        wpid: -1
                     };
                     break;
                 case 'wpt_rates': 
@@ -286,6 +304,7 @@ let app = new Vue({
             }else{
                 if( type == 'wpt_users') { dataSend.append('value', JSON.stringify( this.users.filter( user => user.id == $index )[0] ) ); }
                 else if( type == 'wpt_rates' ) { dataSend.append('value', JSON.stringify( this.rate.filter( rate => rate.id == $index )[0] ) ); }
+                else if( type == 'wpt_settings' ) { dataSend.append('value', JSON.stringify( this.settings ) ); }
                 //else { dataSend.append('value', JSON.stringify( this.investments.filter( investment => investment.id == $index )[0] ) ); }
             }
             const { data } = await axios.post(ajaxurl, dataSend);
@@ -328,7 +347,8 @@ let app = new Vue({
                 pais: "",
                 postalcode: "",
                 telefono: "",
-                monto: 0
+                monto: 0,
+                wpid: -1,
             };
             this.newRate = {
                 id: -1,

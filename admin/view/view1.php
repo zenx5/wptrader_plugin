@@ -14,6 +14,22 @@
                         :items="users"
                         style="text-align:center;"
                         >
+                        <template #item.id="{item, index}">
+                            <span v-if="editRow != index">
+                                <div>{{item.id}}</div>
+                                <div style="border-top: 1px solid black"><span v-if="item.wpid!=-1">wp: <b>{{item.wpid}}</b></span><span v-else>no asignado</span></div>
+                            </span>
+                            <span v-else>
+                            <v-select
+                                :items="$userswp"
+                                item-text="data.display_name"
+                                item-value="data.ID"
+                                v-model="item.wpid"
+                                label="Usuario  WordPress"
+                            >
+                            </v-select>
+                            </span>
+                        </template>
                         <template #item.nombre="{item, index}">
                             <v-text-field 
                                 counter 
@@ -42,7 +58,7 @@
                         </template>
                         <template #item.pais="{item, index}">
                             <v-select
-                                :items="countries"
+                                :items="countries | forKey('enable', 1)"
                                 item-text="label"
                                 item-value="label"
                                 label="Country"
@@ -124,7 +140,7 @@
                 <v-row>
                     <v-col cols="3">
                         <v-select
-                            :items="countries"
+                            :items="countries | forKey('enable', 1)"
                             item-text="label"
                             item-value="label"
                             label="Pais"
@@ -150,6 +166,7 @@
                             :items="$userswp"
                             item-text="data.display_name"
                             item-value="data.ID"
+                            v-model="temp.wpid"
                             label="Usuario WordPress"
                         >
                         </v-select>
