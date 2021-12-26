@@ -73,7 +73,7 @@
                 <v-col cols="12">
                     <v-data-table
                         :headers="headerInvesment"
-                        :items="investments | forKey('usuario',temp.id) | fechaCobro(tiempoCobro)"
+                        :items="investments | forKey('usuario',temp.id) | fechaCobro(settings.tiempoCobro)"
                     >
                     <template #item.fecha="{item}">
                         {{ item.fecha | date }}
