@@ -361,7 +361,7 @@ class WP_Trader {
             }
         }        
         update_option($target, json_encode( $content ) );
-        echo json_encode( $value );
+        echo json_encode( $content );
         wp_die();
     }
 
@@ -385,7 +385,7 @@ class WP_Trader {
             'WP Trader Club',
             'WP Trader Club',
             'manage_options',
-            WP_PLUGIN_DIR.'/wp-trader/admin/view/all.php',
+            'wp-trader/admin/view/all.php',
             null,
             'https://api.iconify.design/ic/round-currency-exchange.svg?color=white',
             5
@@ -396,9 +396,12 @@ class WP_Trader {
         self::update_settings('wpt_users', array() );
         self::update_settings('wpt_investments', array() );
         self::update_settings('wpt_settings', array(
-            "tiempoCobro" => 180,
-            "rmin" => 30,
-            "contrySelect" => ["all"]
+            array(
+                "id" => 0,
+                "tiempoCobro" => 180,
+                "rmin" => 30,
+                "contrySelect" => ["all"]
+            )
         ) );
         self::update_settings('wpt_user_fields', self::$settings['wpt_user_fields'] );
         self::update_settings('db_created', true);

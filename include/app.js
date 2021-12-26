@@ -6,8 +6,10 @@ let app = new Vue({
         return {
             render: false,
             tab: 0,
-            tiempoCobro: 180,
-            rmin: 30,
+            settings: {
+                tiempoCobro: 180,
+                rmin: 30
+            },            
             details: -1,
             editRow: -1,
             tabs: ["Dashboard", "Settings", "Details"],
@@ -97,9 +99,11 @@ let app = new Vue({
         this.rates = $t.rates;
         this.investments = $t.investments;
         this.rates.unshift(this.newRate)
-        this.rmin = $t.settings.rmin;
+        this.settings = $t.settings[0];
+        console.log(this.settings)
+        /*this.rmin = $t.settings.rmin;
         this.tiempoCobro = $t.settings.tiempoCobro;
-        this.countrySelect = $t.settings.countrySelect;
+        this.countrySelect = $t.settings.countrySelect;*/
         await this.getData();
     },
     filters: {
@@ -136,6 +140,11 @@ let app = new Vue({
         }
     },
     methods: {
+        reset() {
+            this.settings.rmin = 30;
+            this.settings.tiempoCobro = 180;
+
+        },
         cobrar(){
 
         },
@@ -295,11 +304,14 @@ let app = new Vue({
             }else{
                 if( type == 'wpt_users') { dataSend.append('value', JSON.stringify( this.users.filter( user => user.id == $index )[0] ) ); }
                 else if( type == 'wpt_rates' ) { dataSend.append('value', JSON.stringify( this.rate.filter( rate => rate.id == $index )[0] ) ); }
+                else if( type == 'wpt_settings' ) { dataSend.append('value', JSON.stringify( this.settings ) ); }
                 //else { dataSend.append('value', JSON.stringify( this.investments.filter( investment => investment.id == $index )[0] ) ); }
             }
             const { data } = await axios.post(ajaxurl, dataSend);
             if( data ) {
-                this.addContent( type, data, $index );
+                if( type != 'wpt_settings ') {
+                    this.addContent( type, data, $index );
+                }
             }
             this.editRow = -1;
             
