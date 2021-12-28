@@ -25,7 +25,12 @@ let app = new Vue({
                 { text: "Dias para cobrar" , value: "cobro", align: "center" },
                 { text: "Accion" , value: "action", align: "center" }
             ],
-            newInvesment: {},
+            newInvesment: {
+                usuario: -1, 
+                fecha: '',
+                monto: 0,
+                released: false
+            },
             investments: [],
             headerSetting:[
                 { text: "Color" , value: "color", align: "center" },
@@ -140,13 +145,34 @@ let app = new Vue({
         }
     },
     methods: {
+        validated( type ) {
+            let valid = true;
+            switch( type ){
+                case 'wpt_users':
+
+                    valid = valid && ( !!this.temp.nombre );
+                    valid = valid && ( !!this.temp.apellido );
+                    valid = valid && ( !!this.temp.cedula );
+                    valid = valid && ( !!this.temp.correo );
+                    valid = valid && ( this.temp.correo.indexOf('@') != -1 );
+                    valid = valid && ( !!this.temp.pais );
+                    valid = valid && ( !!this.temp.postalcode );
+                    valid = valid && ( !!this.temp.telefono );
+                    valid = valid && ( !!this.temp.wpid );
+                    break;
+            }
+
+            return valid;
+        },
         reset() {
             this.settings.rmin = 30;
             this.settings.tiempoCobro = 180;
 
         },
-        cobrar(){
-
+        cobrar( item ){
+            item.released = true;
+            this.newInvesment = item;
+            this.save('wpt_investments', item.id )
         },
         createRate(){
             this.rates.push(this.newRate);
@@ -257,8 +283,10 @@ let app = new Vue({
                 case 'wpt_investments':
                     this.investments.push( data )
                     this.newInvesment = {
+                        usuario: -1, 
                         fecha: '',
-                        monto: 0
+                        monto: 0,
+                        released: false
                     }
             }
         },
@@ -285,6 +313,13 @@ let app = new Vue({
                     return this.newRate;
                 case 'wpt_investments':
                     this.newInvesment.usuario = this.temp.id;
+                    this.investments.forEach( 
+                        investment => 
+                        {
+                            if( investment.id > max ) max = investment.id;
+                        }    
+                    );
+                    this.newInvesment.id = max + 1;
                     return this.newInvesment;
 
             }

@@ -94,10 +94,10 @@ class WP_Trader {
         add_shortcode( 'wpt_user_name', array('WP_Trader', 'shortcode_user_name' ) );
         add_shortcode( 'wpt_count_down', array('WP_Trader', 'shortcode_count_down' ) );
         add_shortcode( 'wpt_get_data', array('WP_Trader', 'shortcode_get_data' ) );
+        
         self::$settings['wpt_users'] = get_option('wpt_users');
         self::$settings['wpt_investments'] = get_option('wpt_investments');
         self::$settings['wpt_settings'] = get_option('wpt_settings');
-
     }
 
     public static function shortcode_get_data( $atts, $content ) {
@@ -106,14 +106,35 @@ class WP_Trader {
             return "campo no especificado";
         };
         
+        $field = $atts['field'];
+
+        if( in_array($field, ["saldo", "inversion", "recibos", "acciones"]) ) {
+            switch( $field ) {
+                case "saldo":
+
+                    break;
+                case "inversion":
+
+                    break;
+                case "recibidos":
+
+                    break;
+                case "acciones":
+
+                    break;
+            }
+
+        }
+
+
         $users = json_decode( get_option('wpt_users'), true);
         
         foreach( $users as $user ) {
             if( $user['id'] == $atts['id'] ) {
-                if ( !isset($user[$atts['field']]) ) {
+                if ( !isset($user[ $field ]) ) {
                     return "campo no existente";
                 };
-                return $user[$atts['field']];
+                return $user[ $field ];
             }
         }
         return 'usuario no existente';

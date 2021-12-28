@@ -130,6 +130,7 @@
                     </v-col>
                     <v-col col="3">
                         <v-text-field
+                            :rules="[ () => !!temp.correo || '¡Field required!']"
                             type="email"
                             label="Correo"
                             v-model="temp.correo"
@@ -174,7 +175,8 @@
                     <v-col>
                         <v-btn 
                             @click="save('wpt_users',-1)"
-                            style="margin-top: 10px">
+                            style="margin-top: 10px"
+                            :disabled="!validated('wpt_users')">
                             <v-icon>mdi-content-save</v-icon>Guardar
                         </v-btn>
                     </v-col>
