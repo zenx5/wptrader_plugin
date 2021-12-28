@@ -145,6 +145,25 @@ let app = new Vue({
         }
     },
     methods: {
+        validated( type ) {
+            let valid = true;
+            switch( type ){
+                case 'wpt_users':
+
+                    valid = valid && ( !!this.temp.nombre );
+                    valid = valid && ( !!this.temp.apellido );
+                    valid = valid && ( !!this.temp.cedula );
+                    valid = valid && ( !!this.temp.correo );
+                    valid = valid && ( this.temp.correo.indexOf('@') != -1 );
+                    valid = valid && ( !!this.temp.pais );
+                    valid = valid && ( !!this.temp.postalcode );
+                    valid = valid && ( !!this.temp.telefono );
+                    valid = valid && ( !!this.temp.wpid );
+                    break;
+            }
+
+            return valid;
+        },
         reset() {
             this.settings.rmin = 30;
             this.settings.tiempoCobro = 180;
