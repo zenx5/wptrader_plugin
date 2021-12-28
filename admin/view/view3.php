@@ -102,7 +102,8 @@
                     <template #item.action="{item}">
                         <v-icon 
                             @click="cobrar"
-                            :disabled="item.cobro>0">mdi-currency-usd</v-icon>
+                            :disabled="item.cobro>0"
+                            v-if="!item.released">mdi-currency-usd</v-icon>
                         <v-icon 
                             @click="del('wpt_investments', item.id)"
                             v-if="!item.released">mdi-delete</v-icon>
