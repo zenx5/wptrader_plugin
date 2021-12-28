@@ -75,17 +75,29 @@
                         :headers="headerInvesment"
                         :items="investments | forKey('usuario',temp.id) | fechaCobro(settings.tiempoCobro)"
                     >
-                    <template #item.fecha="{item}">
-                        {{ item.fecha | date }}
+                    <template #item.fecha="{item}" >
+                        <span :style="item.released?'text-decoration: line-through;':''">
+                            {{ item.fecha | date }}
+                        </span>
                     </template>
                     <template #item.fechacobro="{item}">
-                        {{ item.fechacobro | date }}
+                        <span :style="item.released?'text-decoration: line-through;':''">
+                            {{ item.fechacobro | date }}
+                        </span>
+                    </template>
+                    <template #item.monto="{item}">
+                        <span :style="item.released?'text-decoration: line-through;':''">
+                            {{ item.monto }} $
+                        </span>
                     </template>
                     <template #item.cobro="{item}">
                         <span v-if="item.cobro>0">
                             {{ item.cobro }} dias
                         </span>
-                        <v-chip v-else color="#0f0">Cobrar!!</v-chip>
+                        <span v-else>
+                            <v-chip color="#0f0" v-if="item.released">Cobrado</v-chip>
+                            <v-chip color="#0f0" v-else>Por Cobrar</v-chip>
+                        </span>
                     </template>
                     <template #item.action="{item}">
                         <v-icon 
