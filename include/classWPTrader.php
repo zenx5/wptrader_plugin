@@ -91,7 +91,11 @@ class WP_Trader {
     }
 
     public static function shortcode_get_data( $atts, $content ) {
-        $id = isset( $atts['id'] )?$atts['id']:get_current_user_id();
+        if( isset($atts['id']) ) {
+            $id = $atts['id'];
+        }else{
+            $id = self::get_id( get_current_user_id() );
+        }
         if ( !isset( $atts['field'] ) ) {
             return "campo no especificado";
         };
@@ -120,7 +124,7 @@ class WP_Trader {
         $users = json_decode( get_option('wpt_users'), true);
         
         foreach( $users as $user ) {
-            if( $user['id'] == $atts['id'] ) {
+            if( $user[ 'id' ] == $id ) {
                 if ( !isset($user[ $field ]) ) {
                     return "campo no existente";
                 };
@@ -128,6 +132,15 @@ class WP_Trader {
             }
         }
         return 'usuario no existente';
+    }
+
+    public static function get_id( $wpid ) {
+        $users = json_decode( get_option('wpt_users'), true);
+        foreach( $users as $user ) {
+            if( $user['wpid'] == $wpid ) {
+                return $user['id'];
+            }
+        }
     }
 
     public static function get_total_avalaible($id){
