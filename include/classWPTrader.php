@@ -80,6 +80,7 @@ class WP_Trader {
         add_action( 'admin_footer', array('WP_Trader', 'app') );
         add_action( 'wp_ajax_wpt_save_data', array('WP_Trader', 'wpt_save_data') );
         add_action( 'wp_ajax_wpt_delete_data', array('WP_Trader', 'wpt_delete_data') );
+        add_action( 'wp_ajax_wpt_get_data', array('WP_Trader', 'wpt_get_data') );
         //add_action( 'wp_ajax_wpt_edit_data', array('WP_Trader', 'wpt_edit_data') );
         add_shortcode( 'wpt_user_name', array('WP_Trader', 'shortcode_user_name' ) );
         add_shortcode( 'wpt_count_down', array('WP_Trader', 'shortcode_count_down' ) );
@@ -471,6 +472,27 @@ class WP_Trader {
                 )
             </script>
         <?php
+    }
+
+    public static function wpt_get_data(){
+        $f = $_POST['f'];
+        $data = json_decode( str_replace("\\","",$_POST['data']), true );
+        $id = $data['id'];
+        switch( $f ) {
+            case "get_time": 
+                $id_investment = isset( $data['id_investment'] )?$data['id_investment']:null;
+                return self::get_time( $id, $id_investment )->days;
+                break;
+            case "get_total_avalaible":
+                return self::get_total_avalaible($id);
+                break;
+            case "get_total_invesment":
+                return self::get_total_invesment($id);
+                break;
+            case "get_total_released":
+                return self::get_total_released($id);
+                break;
+        }
     }
 
     public static function wpt_save_data(){

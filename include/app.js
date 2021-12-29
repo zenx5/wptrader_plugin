@@ -161,7 +161,6 @@ let app = new Vue({
                     valid = valid && ( !!this.temp.wpid );
                     break;
             }
-
             return valid;
         },
         reset() {
@@ -182,8 +181,7 @@ let app = new Vue({
                 rate: 0,
                 investmin: 0,
                 investmax: 0
-            };
-            
+            };            
         },
         deleteRate( $index ){
             this.rates = this.rates.filter( 
@@ -405,8 +403,15 @@ let app = new Vue({
                 }    
             );
             return color;
+        },
+        async getAjax( f, $data ) {
+            let dataSend = new FormData();
+            dataSend.append('action', 'wpt_get_data');
+            dataSend.append('f', f );
+            dataSend.append('data', $data );
+            let { data } = await axios.post(ajaxurl, dataSend);
+            return data;
         }
-
     },
     vuetify: new Vuetify()
 });
