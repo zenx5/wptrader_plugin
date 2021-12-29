@@ -162,7 +162,9 @@ class WP_Trader {
             if( $invesment['usuario'] == $id ) {
                 if( !!! $invesment['released']  ) {
                     if( self::get_time($id, $invesment['id'])->days <= 0 ) {
-                        $total += ($settings[0]['tiempoCobro'] - self::get_time($id)->days) * self::calculate_gain( (float)$invesment['monto'] );
+                        $days = $settings[0]['tiempoCobro'] - self::get_time($id)->days;
+                        $days = $days>0?$days:0;
+                        $total += $days * self::calculate_gain( (float)$invesment['monto'] );
                     }
                 }
             }
