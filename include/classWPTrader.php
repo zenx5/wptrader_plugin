@@ -137,7 +137,6 @@ class WP_Trader {
         return 'usuario no existente';
     }
 
-<<<<<<< HEAD
     public static function get_id( $wpid ) {
         $users = json_decode( get_option('wpt_users'), true);
         foreach( $users as $user ) {
@@ -146,9 +145,7 @@ class WP_Trader {
             }
         }
     }
-=======
     
->>>>>>> octavio
 
     public static function get_total_avalaible($id){
         $invesments = json_decode( get_option('wpt_investments'), true );
