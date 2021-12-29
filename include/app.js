@@ -411,6 +411,15 @@ let app = new Vue({
             dataSend.append('data', $data );
             let { data } = await axios.post(ajaxurl, dataSend);
             return data;
+        },
+        async saveWithWP(){
+            let dataSend = new FormData();
+            dataSend.append('action', 'wpt_save_data_with_wp');
+            dataSend.append('id', this.temp.wpid );
+            console.log( this.temp.wpid );
+            let { data } = await axios.post(ajaxurl, dataSend);
+            
+            console.log( data );
         }
     },
     vuetify: new Vuetify()

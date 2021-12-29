@@ -79,6 +79,7 @@ class WP_Trader {
         add_action( 'admin_menu', array('WP_Trader', 'create_menu') );
         add_action( 'admin_footer', array('WP_Trader', 'app') );
         add_action( 'wp_ajax_wpt_save_data', array('WP_Trader', 'wpt_save_data') );
+        add_action( 'wp_ajax_wpt_save_data_with_wp', array('WP_Trader', 'wpt_save_data_with_wp') );
         add_action( 'wp_ajax_wpt_delete_data', array('WP_Trader', 'wpt_delete_data') );
         add_action( 'wp_ajax_wpt_get_data', array('WP_Trader', 'wpt_get_data') );
         //add_action( 'wp_ajax_wpt_edit_data', array('WP_Trader', 'wpt_edit_data') );
@@ -290,7 +291,7 @@ class WP_Trader {
                         };
                         // Create a shadow root
                         const shadow = this.attachShadow({mode: 'open'});
-
+                        :disabled="!validated('wpt_users')"
                         // Create spans
                         const box = document.createElement('span');
                         box.setAttribute('class', 'cd-wrapper');
@@ -493,6 +494,17 @@ class WP_Trader {
                 return self::get_total_released($id);
                 break;
         }
+    }
+
+    public static function wpt_save_data_with_wp(){
+        $id = $_POST['id'];
+        $users = get_users('role=subscriber');
+        foreach( $users as $user ) {
+            if( $user->ID == $id ) {
+                echo json_encode( $user );
+            }
+        }
+        wp_die();
     }
 
     public static function wpt_save_data(){
