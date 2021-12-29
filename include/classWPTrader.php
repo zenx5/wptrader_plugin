@@ -102,8 +102,11 @@ class WP_Trader {
         
         $field = $atts['field'];
 
-        if( in_array($field, ["saldo", "inversion", "recibos", "acciones"]) ) {
+        if( in_array($field, ["cobro", "saldo", "inversion", "recibos", "acciones"]) ) {
             switch( $field ) {
+                case "cobro":
+                    return self::get_time($id)->days;
+                    break;
                 case "saldo":
                     return self::get_total_avalaible($id);
                     break;
@@ -134,6 +137,7 @@ class WP_Trader {
         return 'usuario no existente';
     }
 
+<<<<<<< HEAD
     public static function get_id( $wpid ) {
         $users = json_decode( get_option('wpt_users'), true);
         foreach( $users as $user ) {
@@ -142,14 +146,19 @@ class WP_Trader {
             }
         }
     }
+=======
+    
+>>>>>>> octavio
 
     public static function get_total_avalaible($id){
         $invesments = json_decode( get_option('wpt_investments'), true );
         $total = 0;
         foreach( $invesments as $invesment ) {
             if( $invesment['usuario'] == $id ) {
-                if( !! $invesment['released']  ) {
-                    $total += (float) $invesment['monto'];
+                if( !!! $invesment['released']  ) {
+                    if( self::get_time($id, $invesment['id'])->days <= 0 ) {
+                        $total += (float)$invesment['monto'];
+                    }
                 }
             }
         }
@@ -180,21 +189,62 @@ class WP_Trader {
         return $total;
     }
 
-    public static function get_time($id) {        
+    public static function get_time($id, $id_investment = null ) {
+        $times = [];
+        $max = null;
         $invesments = json_decode( get_option('wpt_investments'), true );
         foreach( $invesments as $invesment ) {
             if( $invesment['usuario'] == $id ) {
                 $end = date_create( $invesment['fecha'] );
                 $end->add( new DateInterval('P180D') );
-                return date_diff( $end, date_create() );
+                $times[ $invesment['id'] ] = date_diff( $end, date_create() );
+                $max = $times[ $invesment['id'] ];
             }
         }
+        if( $id_investment ) {
+            return $times[ $id_investment ];
+        }
+        
+        
+        foreach( $times as $t ) {
+            if( $t->days > $max->days ) {
+                $max = $t;
+            }
+            elseif( $t->days == $max->days ) {
+                if( $t->h > $max->h ) {
+                    $max = $t;
+                }
+                elseif( $t->h == $max->h ) {
+                    if( $t->i > $max->i ) {
+                        $max = $t;
+                    }
+                    elseif( $t->i == $max->i ) {
+                        if( $t->s > $max->s ) {
+                            $max = $t;
+                        }
+                    }
+                }
+            }
+        }
+        return $max;
     }
 
     public static function shortcode_count_down($atts,$content ){
         
         $users = json_decode( get_option('wpt_users'), true);
         
+        $displayStr = isset( $atts['display'] )?$atts['display']:'d:h:m:s';
+        $display = [false, false, false, false];
+        foreach( explode(':', $displayStr) as $dig ) {
+            switch( $dig ) {
+                case 'd': $display[0] = true; break;
+                case 'h': $display[1] = true; break;
+                case 'm': $display[2] = true; break;
+                case 's': $display[3] = true; break;
+            }
+        }
+
+
         $day = 0;
         $hour = 0;
         $minute = 0;
@@ -202,14 +252,15 @@ class WP_Trader {
         $id = isset( $atts['id'] )?$atts['id']:get_current_user_id();
         
         foreach( $users as $user ) {
-            if( $user['wpid'] == $id ) {
+            if( $user['id'] == $id ) {
                 $diff = self::get_time($user['id']);
+                $day = $diff->days;
+                $hour = $diff->h;
+                $minute = $diff->i;
+                $second = $diff->s;
             }
         }
-        $day = $diff->days;
-        $hour = $diff->h;
-        $minute = $diff->i;
-        $second = $diff->s;
+        
 
         ob_start();
         ?>
@@ -294,10 +345,18 @@ class WP_Trader {
                         shadow.appendChild(style);
                         
                         shadow.appendChild(box);
-                        box.appendChild(day);
-                        box.appendChild(hour);
-                        box.appendChild(minute);
-                        box.appendChild(second);
+                        if( <?=json_encode( $display[0] )?> ){
+                            box.appendChild(day);
+                        }
+                        if( <?=json_encode( $display[1] )?> ){
+                            box.appendChild(hour);
+                        }
+                        if( <?=json_encode( $display[2] )?> ){
+                            box.appendChild(minute);
+                        }
+                        if( <?=json_encode( $display[3] )?> ){
+                            box.appendChild(second);
+                        }
                         this.idInterval = setInterval( _ => {
                             this.load();
                             this.tick();
