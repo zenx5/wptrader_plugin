@@ -156,17 +156,21 @@ class WP_Trader {
 
     public static function get_total_avalaible($id){
         $invesments = json_decode( get_option('wpt_investments'), true );
+        $settings = json_decode( get_option('wpt_settings'), true );
         $total = 0;
         foreach( $invesments as $invesment ) {
             if( $invesment['usuario'] == $id ) {
                 if( !!! $invesment['released']  ) {
                     if( self::get_time($id, $invesment['id'])->days <= 0 ) {
-                        $total += self::calculate_gain( (float)$invesment['monto'] );
+                        $total += ($settings[0]['tiempoCobro'] - self::get_time($id)->days) * self::calculate_gain( (float)$invesment['monto'] );
                     }
                 }
             }
         }
-        return $total;
+        if( $total >= $settings[0]['rmin'] ) {
+            return $total;
+        }
+        return 0;
     }
 
     public static function get_total_released($id){
