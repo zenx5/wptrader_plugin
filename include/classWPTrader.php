@@ -16,16 +16,6 @@ class WP_Trader {
         'db_created' => false,
         'plugin_active' => false,
         'wpt_rates' => [],
-        /**
-         *  The struct of the items of the array 
-         *  [
-         *      id => { int },
-         *      color => { string },
-         *      mountdown => { float },
-         *      mountup => { float },
-         *      rate => { float }
-         *  ]
-         */
         'wpt_investments' => [],
         'wpt_users' => [],
         'wpt_settings' => [],
@@ -111,16 +101,16 @@ class WP_Trader {
         if( in_array($field, ["saldo", "inversion", "recibos", "acciones"]) ) {
             switch( $field ) {
                 case "saldo":
-
+                    return self::get_total_avalaible($id);
                     break;
                 case "inversion":
-
+                    return self::get_total_invesment($id);
                     break;
                 case "recibidos":
-
+                    return self::get_total_released($id);
                     break;
                 case "acciones":
-
+                    return 10;
                     break;
             }
 
@@ -140,7 +130,42 @@ class WP_Trader {
         return 'usuario no existente';
     }
 
+    public static function get_total_avalaible($id){
+        $invesments = json_decode( get_option('wpt_investments'), true );
+        $total = 0;
+        foreach( $invesments as $invesment ) {
+            if( $invesment['usuario'] == $id ) {
+                if( !! $invesment['released']  ) {
+                    $total += (float) $invesment['monto'];
+                }
+            }
+        }
+        return $total;
+    }
 
+    public static function get_total_released($id){
+        $invesments = json_decode( get_option('wpt_investments'), true );
+        $total = 0;
+        foreach( $invesments as $invesment ) {
+            if( $invesment['usuario'] == $id ) {
+                if( !! $invesment['released']  ) {
+                    $total += (float) $invesment['monto'];
+                }
+            }
+        }
+        return $total;
+    }
+
+    public static function get_total_invesment($id){
+        $invesments = json_decode( get_option('wpt_investments'), true );
+        $total = 0;
+        foreach( $invesments as $invesment ) {
+            if( $invesment['usuario'] == $id ) {
+                $total += (float) $invesment['monto'];
+            }
+        }
+        return $total;
+    }
 
     public static function get_time($id) {        
         $invesments = json_decode( get_option('wpt_investments'), true );
