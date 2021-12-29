@@ -91,11 +91,8 @@ class WP_Trader {
     }
 
     public static function shortcode_get_data( $atts, $content ) {
-        if( isset($atts['id']) ) {
-            $id = $atts['id'];
-        }else{
-            $id = self::get_id( get_current_user_id() );
-        }
+        $id = isset($atts['id'])?isset($atts['id']):self::get_id( get_current_user_id() );
+        
         if ( !isset( $atts['field'] ) ) {
             return "campo no especificado";
         };
