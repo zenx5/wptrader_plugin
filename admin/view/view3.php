@@ -117,7 +117,6 @@
             <v-row>
                 <v-col cols="6">
                     <v-btn @click="view">Volver</v-btn>
-                    <v-btn style="background-color: blue; color:white;">Cobrar</v-btn>
                 </v-col>
             </v-row>
         </v-card-actions>

@@ -145,6 +145,16 @@ class WP_Trader {
             }
         }
     }
+
+    public static function  calculate_gain( $mount ) {
+        $rates = json_decode( get_option('wpt_rates'), true );
+        foreach( $rates as $rate ){
+            if( ( $mount > $rate['investmin'] ) && ( $mount <= $rate['investmax'] ) ) {
+                return $rate['rate']*$mount;
+            }
+        }
+        return 0;
+    }
     
 
     public static function get_total_avalaible($id){
@@ -154,7 +164,7 @@ class WP_Trader {
             if( $invesment['usuario'] == $id ) {
                 if( !!! $invesment['released']  ) {
                     if( self::get_time($id, $invesment['id'])->days <= 0 ) {
-                        $total += (float)$invesment['monto'];
+                        $total += self::calculate_gain( (float)$invesment['monto'] );
                     }
                 }
             }
