@@ -498,12 +498,53 @@ class WP_Trader {
 
     public static function wpt_save_data_with_wp(){
         $id = $_POST['id'];
-        $users = get_users('role=subscriber');
+        $subscribers = get_users('role=subscriber');
+        $users = json_decode( get_option( 'wpt_users' ), true );
+        $none = true;
+        $max = 0;
         foreach( $users as $user ) {
-            if( $user->ID == $id ) {
-                echo json_encode( $user );
+            if( $user['wpid'] == $id  ) {
+                $none = false;
+            }
+            if( $user['id'] > $max ) {
+                $max = $user['id'];
             }
         }
+        if( $none ) {
+            foreach( $subscribers as $subscriber ) {
+                if( $subscriber->ID == $id ) {
+                    $users[] = [
+                        'id' => $max + 1,
+                        'edit' => false,
+                        'nombre' => $subscriber->display_name,
+                        'apellido' => '',
+                        'cedula' => '',
+                        'correo' => $subscriber->email,
+                        'pais' => '',
+                        'postalcode' => '',
+                        'telefono' => '',
+                        'monto' => 0,
+                        'wpid' => $id
+                    ];
+                    update_option('wpt_users', json_encode( $users ) );
+                    echo json_encode([
+                        'id' => $max + 1,
+                        'edit' => false,
+                        'nombre' => $subscriber->display_name,
+                        'apellido' => '',
+                        'cedula' => '',
+                        'correo' => $subscriber->email,
+                        'pais' => '',
+                        'postalcode' => '',
+                        'telefono' => '',
+                        'monto' => 0,
+                        'wpid' => $id
+                    ]);
+                }
+            }
+        }
+
+        
         wp_die();
     }
 

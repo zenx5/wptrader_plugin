@@ -418,8 +418,13 @@ let app = new Vue({
             dataSend.append('id', this.temp.wpid );
             console.log( this.temp.wpid );
             let { data } = await axios.post(ajaxurl, dataSend);
-            
             console.log( data );
+            if( data ) {
+                console.log()
+                this.users.push( data );
+                //let { ID, user_login, user_email, display_name, user_nicename  } = data.data;
+                //console.log( ID, user_login, user_email, display_name, user_nicename )
+            }
         }
     },
     vuetify: new Vuetify()
