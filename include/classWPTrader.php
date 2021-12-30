@@ -155,7 +155,6 @@ class WP_Trader {
         return 0;
     }
     
-
     public static function get_total_avalaible($id){
         $invesments = json_decode( get_option('wpt_investments'), true );
         $settings = json_decode( get_option('wpt_settings'), true );
@@ -163,7 +162,7 @@ class WP_Trader {
         foreach( $invesments as $invesment ) {
             if( $invesment['usuario'] == $id ) {
                 if( !!! $invesment['released']  ) {
-                    if( self::get_time($id, $invesment['id'])->days <= 0 ) {
+                    if( self::get_time($id, $invesment['id'])->days <= ($settings[0]['tiempoCobro']-$settings[0]['rmin']) ) {
                         $days = $settings[0]['tiempoCobro'] - self::get_time($id)->days;
                         $days = $days>0?$days:0;
                         $total += $days * self::calculate_gain( (float)$invesment['monto'] );
