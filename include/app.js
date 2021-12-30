@@ -67,7 +67,8 @@ let app = new Vue({
                 postalcode: "",
                 telefono: "",
                 monto: 0,
-                wpid: -1
+                wpid: -1,
+                count: null,
             },
             users: [],
             countries: [],
@@ -212,6 +213,7 @@ let app = new Vue({
                 this.details = index;
                 this.temp = this.users[index]
                 this.tab = 2;
+                this.getAjax("count_down", {id:index})
             }else{
                 this.details = -1;
                 this.tab = 0;
@@ -406,11 +408,23 @@ let app = new Vue({
         },
         async getAjax( f, $data ) {
             let dataSend = new FormData();
-            dataSend.append('action', 'wpt_get_data');
+            dataSend.append('action', 'wpt_get_data_for_ajax');
             dataSend.append('f', f );
-            dataSend.append('data', $data );
+            dataSend.append('data', JSON.stringify( $data ) );
             let { data } = await axios.post(ajaxurl, dataSend);
-            return data;
+            this.temp.count = data;
+            this.render = !! this.render;
+        },
+        nextPay(id){
+            let max = 0;
+            const {fechaCobro} = this.$options.filters;
+            fechaCobro( this.investments.filter( investment => investment.usuario == id), this.settings.tiempoCobro )
+            .forEach( ivestment => {
+                if( ivestment.cobro > max ){
+                    max = ivestment.cobro;
+                }
+            })
+            return max;
         },
         async saveWithWP(){
             let dataSend = new FormData();

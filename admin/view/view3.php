@@ -11,11 +11,18 @@
 
         <v-card-text>
             <v-row>
-                <v-col cols="6">
+                <v-col cols="3">
                     <b>Correo</b>
                 </v-col>
-                <v-col cols="6">
+                <v-col cols="3">
                     <i> {{ temp.correo }} </i>
+                </v-col>
+                <v-col cols="6">
+                    <count-down
+                        :data-day="nextPay(temp.id)"
+                        data-display="d:h:m"
+                    >
+                    </count-down>
                 </v-col>
             </v-row>
             <v-row>

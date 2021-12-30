@@ -36,6 +36,7 @@ class WP_Trader {
 
     }
 
+
     public static function get( $key , $as_string  = false ) {
         return $as_string?json_encode( get_option( $key ) ):get_option( $key );
     }
@@ -81,7 +82,7 @@ class WP_Trader {
         add_action( 'wp_ajax_wpt_save_data', array('WP_Trader', 'wpt_save_data') );
         add_action( 'wp_ajax_wpt_save_data_with_wp', array('WP_Trader', 'wpt_save_data_with_wp') );
         add_action( 'wp_ajax_wpt_delete_data', array('WP_Trader', 'wpt_delete_data') );
-        add_action( 'wp_ajax_wpt_get_data', array('WP_Trader', 'wpt_get_data') );
+        add_action( 'wp_ajax_wpt_get_data_for_ajax', array('WP_Trader', 'wpt_get_data_for_ajax') );
         //add_action( 'wp_ajax_wpt_edit_data', array('WP_Trader', 'wpt_edit_data') );
         add_shortcode( 'wpt_user_name', array('WP_Trader', 'shortcode_user_name' ) );
         add_shortcode( 'wpt_count_down', array('WP_Trader', 'shortcode_count_down' ) );
@@ -245,22 +246,12 @@ class WP_Trader {
         $users = json_decode( get_option('wpt_users'), true);
         
         $displayStr = isset( $atts['display'] )?$atts['display']:'d:h:m:s';
-        $display = [false, false, false, false];
-        foreach( explode(':', $displayStr) as $dig ) {
-            switch( $dig ) {
-                case 'd': $display[0] = true; break;
-                case 'h': $display[1] = true; break;
-                case 'm': $display[2] = true; break;
-                case 's': $display[3] = true; break;
-            }
-        }
-
 
         $day = 0;
         $hour = 0;
         $minute = 0;
         $second = 0;
-        $id = isset( $atts['id'] )?$atts['id']:get_current_user_id();
+        $id = isset( $atts['id'] )?$atts['id']:self::get_id(get_current_user_id());
         
         foreach( $users as $user ) {
             if( $user['id'] == $id ) {
@@ -274,164 +265,14 @@ class WP_Trader {
         
 
         ob_start();
-        ?>
-            <script type="text/javascript">
-                // Create a class for the element
-                class CountDown extends HTMLElement {
-                    constructor() {
-                        // Always call super first in constructor
-                        super();
-
-                        this.elements = {
-                            day: null,
-                            hour: null,
-                            minute: null, 
-                            second: null
-                        };
-                        // Create a shadow root
-                        const shadow = this.attachShadow({mode: 'open'});
-                        // Create spans
-                        const box = document.createElement('span');
-                        box.setAttribute('class', 'cd-wrapper');
-                        this.box = box;
-
-
-                        const day = document.createElement('span');
-                        day.setAttribute('class', 'cd-box');
-                        this.day = 0;
-                        day.textContent = this.day;
-                        this.elements.day = day;
-
-                        const hour = document.createElement('span');
-                        hour.setAttribute('class', 'cd-box');
-                        this.hour = 0;
-                        hour.textContent = this.hour;
-                        this.elements.hour = hour;
-
-                        const minute = document.createElement('span');
-                        minute.setAttribute('class', 'cd-box');
-                        this.minute = 0;
-                        minute.textContent = this.minute;
-                        this.elements.minute = minute;
-
-                        const second = document.createElement('span');
-                        second.setAttribute('class', 'cd-box');
-                        this.second = 0;
-                        second.textContent = this.second;
-                        this.elements.second = second;
-                        
-                        const style = document.createElement('style');
-                        
-                        style.textContent = `
-                        .cd-message {
-                            display: flex;
-                            flex-direction: row;
-                            justify-content: center;
-                            font-weight: bold;
-                            font-size: 120%;
-                        }
-                        .cd-wrapper {
-                            display: flex;
-                            flex-direction: row;
-                            justify-content: space-around;
-                        }
-
-                        .cd-box {
-                            width: 90px;
-                            font-size: 50px;
-                            text-align: center;
-                            box-shadow: 0px 0px 10px rgb(0 0 0 / 30%);
-                            border-radius: 10px;                        
-                        }
-                        .cd-box::after {
-                            
-                        }
-                        `;
-
-                        this.target = false;
-                        this.loaded = false;
-
-                        // Attach the created elements to the shadow dom
-                        shadow.appendChild(style);
-                        
-                        shadow.appendChild(box);
-                        if( <?=json_encode( $display[0] )?> ){
-                            box.appendChild(day);
-                        }
-                        if( <?=json_encode( $display[1] )?> ){
-                            box.appendChild(hour);
-                        }
-                        if( <?=json_encode( $display[2] )?> ){
-                            box.appendChild(minute);
-                        }
-                        if( <?=json_encode( $display[3] )?> ){
-                            box.appendChild(second);
-                        }
-                        this.idInterval = setInterval( _ => {
-                            this.load();
-                            this.tick();
-                            this.render();
-                            if( this.target ) {
-                                clearInterval( this.idInterval );
-                                this.box.textContent = this.message;
-                                this.box.setAttribute("class", "cd-message")
-                            }
-                        }, 1000 );
-                    }
-
-                    load() {
-                        if( ! this.loaded ) {   
-                            this.day = this.getAttribute("data-day") || 0;
-                            this.hour = this.getAttribute("data-hour") || 0;
-                            this.minute = this.getAttribute("data-minute") || 0;
-                            this.second = this.getAttribute("data-second") || 0;
-                            this.message = this.getAttribute("data-message") || 0;
-                            this.loaded = true;
-                        }
-                    }
-
-                    render() {
-                        this.elements.day.textContent = this.day;
-                        this.elements.hour.textContent = this.hour;
-                        this.elements.minute.textContent = this.minute;
-                        this.elements.second.textContent = this.second;
-                    }
-
-                    tick() {
-                        this.second--;
-                        if( this.second < 0 ) {
-                            this.second = 59;
-                            this.minute--;
-                            if( this.minute < 0 ) {
-                                this.minute = 59;
-                                this.hour--;
-                                if( this.hour < 0 ) {
-                                    this.hour = 23;
-                                    this.day--;
-                                    if( this.day < 0 ) {
-                                        this.day = 0;
-                                        this.hour = 0;
-                                        this.minute = 0;
-                                        this.second = 0;
-                                        this.target = true;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // Define the new element
-                customElements.define('count-down', CountDown);
-                
-            </script>
-            
+        ?>            
             <count-down
                 data-day="<?=$day?>"
                 data-hour="<?=$hour?>"
                 data-minute="<?=$minute?>"
                 data-second="<?=$second?>"
                 data-message="Su suscripcion ha expirado"
+                data-display="<?=$displayStr?>"
             ></count-down>
         <?php
         
@@ -473,23 +314,26 @@ class WP_Trader {
         <?php
     }
 
-    public static function wpt_get_data(){
+    public static function wpt_get_data_for_ajax(){
         $f = $_POST['f'];
         $data = json_decode( str_replace("\\","",$_POST['data']), true );
         $id = $data['id'];
         switch( $f ) {
             case "get_time": 
                 $id_investment = isset( $data['id_investment'] )?$data['id_investment']:null;
-                return self::get_time( $id, $id_investment )->days;
+                echo self::get_time( $id, $id_investment )->days;
                 break;
             case "get_total_avalaible":
-                return self::get_total_avalaible($id);
+                echo self::get_total_avalaible($id);
                 break;
             case "get_total_invesment":
-                return self::get_total_invesment($id);
+                echo self::get_total_invesment($id);
                 break;
             case "get_total_released":
-                return self::get_total_released($id);
+                echo self::get_total_released($id);
+                break;
+            case "count_down":
+                echo self::shortcode_count_down(["id"=>$data['id']], []);
                 break;
         }
     }
@@ -586,7 +430,7 @@ class WP_Trader {
             'WP Trader Club',
             'WP Trader Club',
             'manage_options',
-            'wp-trader-x/admin/view/all.php',
+            'wp-trader/admin/view/all.php',
             null,
             'https://api.iconify.design/ic/round-currency-exchange.svg?color=white',
             5
@@ -625,6 +469,155 @@ class WP_Trader {
             <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
             <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+            <script type="text/javascript">
+                // Create a class for the element
+                class CountDown extends HTMLElement {
+                    constructor() {
+                        // Always call super first in constructor
+                        super();
+
+                        this.elements = {
+                            day: null,
+                            hour: null,
+                            minute: null, 
+                            second: null
+                        };
+                        // Create a shadow root
+                        const shadow = this.attachShadow({mode: 'open'});
+                        // Create spans
+                        const box = document.createElement('span');
+                        box.setAttribute('class', 'cd-wrapper');
+                        this.box = box;
+
+
+                        const day = document.createElement('span');
+                        day.setAttribute('class', 'cd-box');
+                        this.day = 0;
+                        day.textContent = this.day;
+                        this.elements.day = day;
+
+                        const hour = document.createElement('span');
+                        hour.setAttribute('class', 'cd-box');
+                        this.hour = 0;
+                        hour.textContent = this.hour;
+                        this.elements.hour = hour;
+
+                        const minute = document.createElement('span');
+                        minute.setAttribute('class', 'cd-box');
+                        this.minute = 0;
+                        minute.textContent = this.minute;
+                        this.elements.minute = minute;
+
+                        const second = document.createElement('span');
+                        second.setAttribute('class', 'cd-box');
+                        this.second = 0;
+                        second.textContent = this.second;
+                        this.elements.second = second;
+                        
+                        const style = document.createElement('style');
+                        
+                        style.textContent = `
+                        .cd-message {
+                            display: flex;
+                            flex-direction: row;
+                            justify-content: center;
+                            font-weight: bold;
+                            font-size: 120%;
+                        }
+                        .cd-wrapper {
+                            display: flex;
+                            flex-direction: row;
+                            justify-content: space-around;
+                        }
+
+                        .cd-box {
+                            width: 90px;
+                            font-size: 50px;
+                            text-align: center;
+                            box-shadow: 0px 0px 10px rgb(0 0 0 / 30%);
+                            border-radius: 10px;                        
+                        }
+                        .cd-box::after {
+                            
+                        }
+                        `;
+
+                        this.target = false;
+                        this.loaded = false;
+
+                        // Attach the created elements to the shadow dom
+                        shadow.appendChild(style);
+                        
+                        shadow.appendChild(box);
+                        box.appendChild(day);
+                        box.appendChild(hour);
+                        box.appendChild(minute);
+                        box.appendChild(second);
+                        
+                        this.idInterval = setInterval( _ => {
+                            this.load();
+                            this.tick();
+                            this.render();
+                            if( this.target ) {
+                                clearInterval( this.idInterval );
+                                this.box.textContent = this.message;
+                                this.box.setAttribute("class", "cd-message")
+                            }
+                        }, 1000 );
+                    }
+
+                    load() {
+                        if( ! this.loaded ) {   
+                            this.day = this.getAttribute("data-day") || 0;
+                            this.hour = this.getAttribute("data-hour") || 0;
+                            this.minute = this.getAttribute("data-minute") || 0;
+                            this.second = this.getAttribute("data-second") || 0;
+                            this.message = this.getAttribute("data-message") || 0;
+                            this.display = this.getAttribute("data-display") || "d:h:m:s";
+                            this.display = this.display.split(":");
+                            this.loaded = true;
+                        }
+                    }
+
+                    render() {
+                        this.elements.day.style.display = this.display.indexOf('d')==-1?'none':'inline-block';
+                        this.elements.day.textContent = this.day;
+                        this.elements.hour.style.display = this.display.indexOf('h')==-1?'none':'inline-block';
+                        this.elements.hour.textContent = this.hour;
+                        this.elements.minute.style.display = this.display.indexOf('m')==-1?'none':'inline-block';
+                        this.elements.minute.textContent = this.minute;
+                        this.elements.second.style.display = this.display.indexOf('s')==-1?'none':'inline-block';
+                        this.elements.second.textContent = this.second;
+                    }
+
+                    tick() {
+                        this.second--;
+                        if( this.second < 0 ) {
+                            this.second = 59;
+                            this.minute--;
+                            if( this.minute < 0 ) {
+                                this.minute = 59;
+                                this.hour--;
+                                if( this.hour < 0 ) {
+                                    this.hour = 23;
+                                    this.day--;
+                                    if( this.day < 0 ) {
+                                        this.day = 0;
+                                        this.hour = 0;
+                                        this.minute = 0;
+                                        this.second = 0;
+                                        this.target = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Define the new element
+                customElements.define('count-down', CountDown);
+                
+            </script>
             <script type="text/javascript">
             <?php
                 include "countries.js";
