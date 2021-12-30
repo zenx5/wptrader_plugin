@@ -291,7 +291,6 @@ class WP_Trader {
                         };
                         // Create a shadow root
                         const shadow = this.attachShadow({mode: 'open'});
-                        :disabled="!validated('wpt_users')"
                         // Create spans
                         const box = document.createElement('span');
                         box.setAttribute('class', 'cd-wrapper');
