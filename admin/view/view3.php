@@ -26,11 +26,14 @@
                 </v-col>
             </v-row>
             <v-row>
-                <v-col cols="6">
+                <v-col cols="3">
                     <b>Pais</b>
                 </v-col>
-                <v-col cols="6">
+                <v-col cols="3">
                     <i> {{ temp.pais }} </i>
+                </v-col>
+                <v-col cols="6">
+                    
                 </v-col>
             </v-row>
             <v-row>
