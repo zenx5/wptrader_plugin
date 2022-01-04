@@ -16,18 +16,9 @@ class WP_Trader {
         'db_created' => false,
         'plugin_active' => false,
         'wpt_rates' => [],
-        /**
-         *  The struct of the items of the array 
-         *  [
-         *      id => { int },
-         *      color => { string },
-         *      mountdown => { float },
-         *      mountup => { float },
-         *      rate => { float }
-         *  ]
-         */
         'wpt_investments' => [],
         'wpt_users' => [],
+        'wpt_actions' => [],
         'wpt_settings' => [],
         'wpt_user_fields' => [ 
             "monto" => "Monto",
@@ -46,6 +37,7 @@ class WP_Trader {
 
     }
 
+
     public static function get( $key , $as_string  = false ) {
         return $as_string?json_encode( get_option( $key ) ):get_option( $key );
     }
@@ -63,6 +55,7 @@ class WP_Trader {
             'wpt_investments' => [],
             'wpt_settings' => [],
             'wpt_users' => [],
+            'wpt_actions' => [],
             'wpt_user_fields' => [ 
                 "monto" => "Monto",
                 "telefono" => "Telefono",
@@ -89,71 +82,399 @@ class WP_Trader {
         add_action( 'admin_menu', array('WP_Trader', 'create_menu') );
         add_action( 'admin_footer', array('WP_Trader', 'app') );
         add_action( 'wp_ajax_wpt_save_data', array('WP_Trader', 'wpt_save_data') );
+        add_action( 'wp_ajax_wpt_save_data_with_wp', array('WP_Trader', 'wpt_save_data_with_wp') );
         add_action( 'wp_ajax_wpt_delete_data', array('WP_Trader', 'wpt_delete_data') );
+        add_action( 'wp_ajax_wpt_get_data_for_ajax', array('WP_Trader', 'wpt_get_data_for_ajax') );
         //add_action( 'wp_ajax_wpt_edit_data', array('WP_Trader', 'wpt_edit_data') );
         add_shortcode( 'wpt_user_name', array('WP_Trader', 'shortcode_user_name' ) );
         add_shortcode( 'wpt_count_down', array('WP_Trader', 'shortcode_count_down' ) );
         add_shortcode( 'wpt_get_data', array('WP_Trader', 'shortcode_get_data' ) );
+        
         self::$settings['wpt_users'] = get_option('wpt_users');
+        self::$settings['wpt_actions'] = get_option('wpt_actions');
         self::$settings['wpt_investments'] = get_option('wpt_investments');
         self::$settings['wpt_settings'] = get_option('wpt_settings');
-
     }
 
     public static function shortcode_get_data( $atts, $content ) {
-        $id = isset( $atts['id'] )?$atts['id']:get_current_user_id();
+        $id = isset($atts['id'])?isset($atts['id']):self::get_id( get_current_user_id() );
+        
         if ( !isset( $atts['field'] ) ) {
             return "campo no especificado";
         };
         
+        $field = $atts['field'];
+
+        if( in_array($field, ["cobro", "saldo", "inversion", "recibos", "acciones"]) ) {
+            switch( $field ) {
+                case "cobro":
+                    return self::get_time($id)->days;
+                    break;
+                case "saldo":
+                    return self::get_total_avalaible($id);
+                    break;
+                case "inversion":
+                    return self::get_total_invesment($id);
+                    break;
+                case "recibidos":
+                    return self::get_total_released($id);
+                    break;
+                case "acciones":
+                    return 10;
+                    break;
+            }
+
+        }
+
+
         $users = json_decode( get_option('wpt_users'), true);
         
         foreach( $users as $user ) {
-            if( $user['id'] == $atts['id'] ) {
-                if ( !isset($user[$atts['field']]) ) {
+            if( $user[ 'id' ] == $id ) {
+                if ( !isset($user[ $field ]) ) {
                     return "campo no existente";
                 };
-                return $user[$atts['field']];
+                return $user[ $field ];
             }
         }
         return 'usuario no existente';
     }
 
-
-
-    public static function get_time($id) {        
-        $investments = json_decode( get_option('wpt_investments'), true );
-        foreach( $investments as $investment ) {
-            if( $investment['usuario'] == $id ) {
-                $end = date_create( $investment['fecha'] );
-                $end->add( new DateInterval('P180D') );
-                return date_diff( $end, date_create() );
+    public static function get_id( $wpid ) {
+        $users = json_decode( get_option('wpt_users'), true);
+        foreach( $users as $user ) {
+            if( $user['wpid'] == $wpid ) {
+                return $user['id'];
             }
         }
+    }
+
+    public static function  calculate_gain( $mount ) {
+        $rates = json_decode( get_option('wpt_rates'), true );
+        foreach( $rates as $rate ){
+            if( ( $mount > $rate['investmin'] ) && ( $mount <= $rate['investmax'] ) ) {
+                return $rate['rate']*$mount;
+            }
+        }
+        return 0;
+    }
+    
+    public static function get_total_avalaible($id){
+        $invesments = json_decode( get_option('wpt_investments'), true );
+        $settings = json_decode( get_option('wpt_settings'), true );
+        $total = 0;
+        foreach( $invesments as $invesment ) {
+            if( $invesment['usuario'] == $id ) {
+                if( !!! $invesment['released']  ) {
+                    if( self::get_time($id, $invesment['id'])->days <= ($settings[0]['tiempoCobro']-$settings[0]['rmin']) ) {
+                        $days = $settings[0]['tiempoCobro'] - self::get_time($id)->days;
+                        $days = $days>0?$days:0;
+                        $total += $days * self::calculate_gain( (float)$invesment['monto'] );
+                    }
+                }
+            }
+        }
+        if( $total >= $settings[0]['rmin'] ) {
+            return $total;
+        }
+        return 0;
+    }
+
+    public static function get_total_released($id){
+        $invesments = json_decode( get_option('wpt_investments'), true );
+        $total = 0;
+        foreach( $invesments as $invesment ) {
+            if( $invesment['usuario'] == $id ) {
+                if( !! $invesment['released']  ) {
+                    $total += (float) $invesment['monto'];
+                }
+            }
+        }
+        return $total;
+    }
+
+    public static function get_total_invesment($id){
+        $invesments = json_decode( get_option('wpt_investments'), true );
+        $total = 0;
+        foreach( $invesments as $invesment ) {
+            if( $invesment['usuario'] == $id ) {
+                $total += (float) $invesment['monto'];
+            }
+        }
+        return $total;
+    }
+
+    public static function get_time($id, $id_investment = null ) {
+        $times = [];
+        $max = null;
+        $invesments = json_decode( get_option('wpt_investments'), true );
+        foreach( $invesments as $invesment ) {
+            if( $invesment['usuario'] == $id ) {
+                $end = date_create( $invesment['fecha'] );
+                $end->add( new DateInterval('P180D') );
+                $times[ $invesment['id'] ] = date_diff( $end, date_create() );
+                $max = $times[ $invesment['id'] ];
+            }
+        }
+        if( $id_investment ) {
+            return $times[ $id_investment ];
+        }
+        
+        
+        foreach( $times as $t ) {
+            if( $t->days > $max->days ) {
+                $max = $t;
+            }
+            elseif( $t->days == $max->days ) {
+                if( $t->h > $max->h ) {
+                    $max = $t;
+                }
+                elseif( $t->h == $max->h ) {
+                    if( $t->i > $max->i ) {
+                        $max = $t;
+                    }
+                    elseif( $t->i == $max->i ) {
+                        if( $t->s > $max->s ) {
+                            $max = $t;
+                        }
+                    }
+                }
+            }
+        }
+        return $max;
     }
 
     public static function shortcode_count_down($atts,$content ){
         
         $users = json_decode( get_option('wpt_users'), true);
         
+        $displayStr = isset( $atts['display'] )?$atts['display']:'d:h:m:s';
+
         $day = 0;
         $hour = 0;
         $minute = 0;
         $second = 0;
-        $id = isset( $atts['id'] )?$atts['id']:get_current_user_id();
+        $id = isset( $atts['id'] )?$atts['id']:self::get_id(get_current_user_id());
         
         foreach( $users as $user ) {
-            if( $user['wpid'] == $id ) {
+            if( $user['id'] == $id ) {
                 $diff = self::get_time($user['id']);
+                $day = $diff->days;
+                $hour = $diff->h;
+                $minute = $diff->i;
+                $second = $diff->s;
             }
         }
-        $day = $diff->days;
-        $hour = $diff->h;
-        $minute = $diff->i;
-        $second = $diff->s;
+        
 
         ob_start();
+        ?>            
+            <count-down
+                data-day="<?=$day?>"
+                data-hour="<?=$hour?>"
+                data-minute="<?=$minute?>"
+                data-second="<?=$second?>"
+                data-message="Su suscripcion ha expirado"
+                data-display="<?=$displayStr?>"
+            ></count-down>
+        <?php
+        
+        $html = ob_get_contents();
+        ob_end_clean();
+        return $html;
+    }
+
+    public static function shortcode_user_name($atts,$content ){
+        $users = json_decode( get_option('wpt_users'), true);
+        
+        foreach( $users as $user ) {
+            if( $user['id'] == $atts['id'] ) {
+                return $user['nombre']." ".$user['apellido'];
+            }
+        }
+        return "Usuario no existe";   
+    }
+
+    public static function javascript_ajax(){
         ?>
+            <script type="text/javascript">
+                jQuery( document ).ready( 
+                    $ => 
+                    {
+                        let data = {
+                            "action" : "wpt_save_data",
+                        };
+
+                        jQuery.post(ajaxurl, data, 
+                            response => 
+                            {
+                                console.log( response );
+                            }
+                        );
+                    }
+                )
+            </script>
+        <?php
+    }
+
+    public static function wpt_get_data_for_ajax(){
+        $f = $_POST['f'];
+        $data = json_decode( str_replace("\\","",$_POST['data']), true );
+        $id = $data['id'];
+        switch( $f ) {
+            case "get_time": 
+                $id_investment = isset( $data['id_investment'] )?$data['id_investment']:null;
+                echo self::get_time( $id, $id_investment )->days;
+                break;
+            case "get_total_avalaible":
+                echo self::get_total_avalaible($id);
+                break;
+            case "get_total_invesment":
+                echo self::get_total_invesment($id);
+                break;
+            case "get_total_released":
+                echo self::get_total_released($id);
+                break;
+            case "count_down":
+                echo self::shortcode_count_down(["id"=>$data['id']], []);
+                break;
+        }
+    }
+
+    public static function wpt_save_data_with_wp(){
+        $id = $_POST['id'];
+        $subscribers = get_users('role=subscriber');
+        $users = json_decode( get_option( 'wpt_users' ), true );
+        $none = true;
+        $max = 0;
+        foreach( $users as $user ) {
+            if( $user['wpid'] == $id  ) {
+                $none = false;
+            }
+            if( $user['id'] > $max ) {
+                $max = $user['id'];
+            }
+        }
+        if( $none ) {
+            foreach( $subscribers as $subscriber ) {
+                if( $subscriber->ID == $id ) {
+                    $users[] = [
+                        'id' => $max + 1,
+                        'edit' => false,
+                        'nombre' => $subscriber->display_name,
+                        'apellido' => '',
+                        'cedula' => '',
+                        'correo' => $subscriber->email,
+                        'pais' => '',
+                        'postalcode' => '',
+                        'telefono' => '',
+                        'monto' => 0,
+                        'wpid' => $id, 
+                        'actions' => 0
+                    ];
+                    update_option('wpt_users', json_encode( $users ) );
+                    echo json_encode([
+                        'id' => $max + 1,
+                        'edit' => false,
+                        'nombre' => $subscriber->display_name,
+                        'apellido' => '',
+                        'cedula' => '',
+                        'correo' => $subscriber->email,
+                        'pais' => '',
+                        'postalcode' => '',
+                        'telefono' => '',
+                        'monto' => 0,
+                        'wpid' => $id,
+                        'actions' => 0
+                    ]);
+                }
+            }
+        }
+
+        
+        wp_die();
+    }
+
+    public static function wpt_save_data(){
+        $target = $_POST['target'];
+        $value = json_decode( str_replace("\\","",$_POST['value']), true );
+        $id = $_POST['index'];
+        $content = json_decode( get_option( $target ), true );
+        if( $id == -1 ) {
+            $content[] = $value;
+        }else{
+            $aux = [];
+            foreach( $content as $index => $element ) {
+                if( $element['id'] == $id ) {
+                    $content[ $index ] = $value;
+                }
+            }
+        }        
+        update_option($target, json_encode( $content ) );
+        echo json_encode( $value );
+        wp_die();
+    }
+
+    public static function wpt_delete_data(){
+        $target = $_POST['target'];
+        $index = $_POST['index'];
+        $content = json_decode( get_option( $target ), true );
+        $aux = [];
+        foreach( $content as $element ) {
+            if( $element['id'] != $index ) {
+                $aux[] = $element;
+            }
+        }
+        update_option($target, json_encode( $aux ) );
+        echo json_encode( $aux );
+        wp_die();
+    }
+
+    public static function create_menu(){
+        add_menu_page(
+            'WP Trader Club',
+            'WP Trader Club',
+            'manage_options',
+            'wp-trader/admin/view/all.php',
+            null,
+            'https://api.iconify.design/ic/round-currency-exchange.svg?color=white',
+            5
+        );
+    }
+    public static function create_db(){
+        self::update_settings('wpt_rates', array() );
+        self::update_settings('wpt_users', array() );
+        self::update_settings('wpt_actions', array() );
+        self::update_settings('wpt_investments', array() );
+        self::update_settings('wpt_settings', array(
+            array(
+                "id" => 0,
+                "tiempoCobro" => 180,
+                "rmin" => 30,
+                "contrySelect" => ["all"]
+            )
+        ) );
+        self::update_settings('wpt_user_fields', self::$settings['wpt_user_fields'] );
+        self::update_settings('db_created', true);
+    }
+
+    public static function update_settings($key, $value) {
+        if( isset( self::$settings[$key] ) ) {
+            update_option( $key, json_encode( $value ));
+            self::$settings[$key] = $value;
+        }
+    }
+
+
+
+    /*** RENDER */
+    public static function dependecies(){
+        ?>
+            <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
+            <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+            <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+            <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
             <script type="text/javascript">
                 // Create a class for the element
                 class CountDown extends HTMLElement {
@@ -169,7 +490,6 @@ class WP_Trader {
                         };
                         // Create a shadow root
                         const shadow = this.attachShadow({mode: 'open'});
-
                         // Create spans
                         const box = document.createElement('span');
                         box.setAttribute('class', 'cd-wrapper');
@@ -239,6 +559,7 @@ class WP_Trader {
                         box.appendChild(hour);
                         box.appendChild(minute);
                         box.appendChild(second);
+                        
                         this.idInterval = setInterval( _ => {
                             this.load();
                             this.tick();
@@ -258,14 +579,20 @@ class WP_Trader {
                             this.minute = this.getAttribute("data-minute") || 0;
                             this.second = this.getAttribute("data-second") || 0;
                             this.message = this.getAttribute("data-message") || 0;
+                            this.display = this.getAttribute("data-display") || "d:h:m:s";
+                            this.display = this.display.split(":");
                             this.loaded = true;
                         }
                     }
 
                     render() {
+                        this.elements.day.style.display = this.display.indexOf('d')==-1?'none':'inline-block';
                         this.elements.day.textContent = this.day;
+                        this.elements.hour.style.display = this.display.indexOf('h')==-1?'none':'inline-block';
                         this.elements.hour.textContent = this.hour;
+                        this.elements.minute.style.display = this.display.indexOf('m')==-1?'none':'inline-block';
                         this.elements.minute.textContent = this.minute;
+                        this.elements.second.style.display = this.display.indexOf('s')==-1?'none':'inline-block';
                         this.elements.second.textContent = this.second;
                     }
 
@@ -297,130 +624,6 @@ class WP_Trader {
                 customElements.define('count-down', CountDown);
                 
             </script>
-            
-            <count-down
-                data-day="<?=$day?>"
-                data-hour="<?=$hour?>"
-                data-minute="<?=$minute?>"
-                data-second="<?=$second?>"
-                data-message="Su suscripcion ha expirado"
-            ></count-down>
-        <?php
-        
-        $html = ob_get_contents();
-        ob_end_clean();
-        return $html;
-    }
-
-    public static function shortcode_user_name($atts,$content ){
-        $users = json_decode( get_option('wpt_users'), true);
-        
-        foreach( $users as $user ) {
-            if( $user['id'] == $atts['id'] ) {
-                return $user['nombre']." ".$user['apellido'];
-            }
-        }
-        return "Usuario no existe";   
-    }
-
-    public static function javascript_ajax(){
-        ?>
-            <script type="text/javascript">
-                jQuery( document ).ready( 
-                    $ => 
-                    {
-                        let data = {
-                            "action" : "wpt_save_data",
-                        };
-
-                        jQuery.post(ajaxurl, data, 
-                            response => 
-                            {
-                                console.log( response );
-                            }
-                        );
-                    }
-                )
-            </script>
-        <?php
-    }
-
-    public static function wpt_save_data(){
-        $target = $_POST['target'];
-        $value = json_decode( str_replace("\\","",$_POST['value']), true );
-        $id = $_POST['index'];
-        $content = json_decode( get_option( $target ), true );
-        if( $id == -1 ) {
-            $content[] = $value;
-        }else{
-            $aux = [];
-            foreach( $content as $index => $element ) {
-                if( $element['id'] == $id ) {
-                    $content[ $index ] = $value;
-                }
-            }
-        }        
-        update_option($target, json_encode( $content ) );
-        echo json_encode( $value );
-        wp_die();
-    }
-
-    public static function wpt_delete_data(){
-        $target = $_POST['target'];
-        $index = $_POST['index'];
-        $content = json_decode( get_option( $target ), true );
-        $aux = [];
-        foreach( $content as $element ) {
-            if( $element['id'] != $index ) {
-                $aux[] = $element;
-            }
-        }
-        update_option($target, json_encode( $aux ) );
-        echo json_encode( $aux );
-        wp_die();
-    }
-
-    public static function create_menu(){
-        add_menu_page(
-            'WP Trader Club',
-            'WP Trader Club',
-            'manage_options',
-            WP_PLUGIN_DIR.'/wp-trader/admin/view/all.php',
-            null,
-            'https://api.iconify.design/ic/round-currency-exchange.svg?color=white',
-            5
-        );
-    }
-    public static function create_db(){
-        self::update_settings('wpt_rates', array() );
-        self::update_settings('wpt_users', array() );
-        self::update_settings('wpt_investments', array() );
-        self::update_settings('wpt_settings', array(
-            "tiempoCobro" => 180,
-            "rmin" => 30,
-            "contrySelect" => ["all"]
-        ) );
-        self::update_settings('wpt_user_fields', self::$settings['wpt_user_fields'] );
-        self::update_settings('db_created', true);
-    }
-
-    public static function update_settings($key, $value) {
-        if( isset( self::$settings[$key] ) ) {
-            update_option( $key, json_encode( $value ));
-            self::$settings[$key] = $value;
-        }
-    }
-
-
-
-    /*** RENDER */
-    public static function dependecies(){
-        ?>
-            <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
-            <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
-            <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
-            <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
             <script type="text/javascript">
             <?php
                 include "countries.js";
@@ -428,7 +631,13 @@ class WP_Trader {
             ?>
             // Obtenemos los usuarios de worpress y le aplicamos JSON.parse para convertirlo de string a object
             let $userswp = JSON.parse('<?= json_encode( get_users('role=subscriber') ); ?>')
-            let $t = new WPTrader(<?=self::get('wpt_user_fields',false)?>,<?=self::get('wpt_users', false)?>,<?=self::get('wpt_investments',false)?>,<?=self::get('wpt_rates',false)?>);
+            let $t = new WPTrader(
+                <?=self::get('wpt_user_fields',false)?>,
+                <?=self::get('wpt_users', false)?>,
+                <?=self::get('wpt_actions', false)?>,
+                <?=self::get('wpt_investments',false)?>,
+                <?=self::get('wpt_rates',false)?>
+            );
             $t.setSettings(<?=self::get('wpt_settings',false)?>)
             </script>
         <?php

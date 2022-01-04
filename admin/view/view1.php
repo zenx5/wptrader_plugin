@@ -107,60 +107,6 @@
             <v-card-title>Nuevo Inversor </v-card-title>
             <v-form>
                 <v-row>
-                    <v-col col="3">
-                        <v-text-field 
-                            label="Nombre"
-                            v-model="temp.nombre"
-                            counter>
-                        </v-text-field>                    
-                    </v-col>
-                    <v-col col="3">
-                        <v-text-field
-                            label="Apellido"
-                            v-model="temp.apellido"
-                            counter>
-                        </v-text-field>                    
-                    </v-col>
-                    <v-col col="3">
-                        <v-text-field
-                            label="Cedula"
-                            v-model="temp.cedula"
-                            counter>
-                        </v-text-field>                    
-                    </v-col>
-                    <v-col col="3">
-                        <v-text-field
-                            type="email"
-                            label="Correo"
-                            v-model="temp.correo"
-                            counter>
-                        </v-text-field>                    
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col cols="3">
-                        <v-select
-                            :items="countries | forKey('enable', 1)"
-                            item-text="label"
-                            item-value="label"
-                            label="Pais"
-                            v-model="temp.pais">
-                        </v-select>
-                    </v-col>
-                    <v-col cols="2">
-                        <v-text-field
-                            label="Codigo Postal"
-                            v-model="temp.postalcode"
-                            counter>
-                        </v-text-field>
-                    </v-col>
-                    <v-col cols="2">
-                        <v-text-field
-                            label="Telefono"
-                            v-model="temp.telefono"
-                            counter>
-                        </v-text-field>
-                    </v-col>
                     <v-col>
                         <v-select
                             :items="$userswp"
@@ -173,7 +119,7 @@
                     </v-col>
                     <v-col>
                         <v-btn 
-                            @click="save('wpt_users',-1)"
+                            @click="saveWithWP"
                             style="margin-top: 10px">
                             <v-icon>mdi-content-save</v-icon>Guardar
                         </v-btn>

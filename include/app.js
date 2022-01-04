@@ -6,8 +6,10 @@ let app = new Vue({
         return {
             render: false,
             tab: 0,
-            tiempoCobro: 180,
-            rmin: 30,
+            settings: {
+                tiempoCobro: 180,
+                rmin: 30
+            },            
             details: -1,
             editRow: -1,
             tabs: ["Dashboard", "Settings", "Details"],
@@ -23,7 +25,12 @@ let app = new Vue({
                 { text: "Dias para cobrar" , value: "cobro", align: "center" },
                 { text: "Accion" , value: "action", align: "center" }
             ],
-            newInvestment: {},
+            newInvesment: {
+                usuario: -1, 
+                fecha: '',
+                monto: 0,
+                released: false
+            },
             investments: [],
             headerSetting:[
                 { text: "Color" , value: "color", align: "center" },
@@ -60,7 +67,8 @@ let app = new Vue({
                 postalcode: "",
                 telefono: "",
                 monto: 0,
-                wpid: -1
+                wpid: -1,
+                count: null,
             },
             users: [],
             countries: [],
@@ -97,9 +105,11 @@ let app = new Vue({
         this.rates = $t.rates;
         this.investments = $t.investments;
         this.rates.unshift(this.newRate)
-        this.rmin = $t.settings.rmin;
+        this.settings = $t.settings[0];
+        console.log(this.settings)
+        /*this.rmin = $t.settings.rmin;
         this.tiempoCobro = $t.settings.tiempoCobro;
-        this.countrySelect = $t.settings.countrySelect;
+        this.countrySelect = $t.settings.countrySelect;*/
         await this.getData();
     },
     filters: {
@@ -136,8 +146,33 @@ let app = new Vue({
         }
     },
     methods: {
-        cobrar(){
+        validated( type ) {
+            let valid = true;
+            switch( type ){
+                case 'wpt_users':
 
+                    valid = valid && ( !!this.temp.nombre );
+                    valid = valid && ( !!this.temp.apellido );
+                    valid = valid && ( !!this.temp.cedula );
+                    valid = valid && ( !!this.temp.correo );
+                    valid = valid && ( this.temp.correo.indexOf('@') != -1 );
+                    valid = valid && ( !!this.temp.pais );
+                    valid = valid && ( !!this.temp.postalcode );
+                    valid = valid && ( !!this.temp.telefono );
+                    valid = valid && ( !!this.temp.wpid );
+                    break;
+            }
+            return valid;
+        },
+        reset() {
+            this.settings.rmin = 30;
+            this.settings.tiempoCobro = 180;
+
+        },
+        cobrar( item ){
+            item.released = true;
+            this.newInvesment = item;
+            this.save('wpt_investments', item.id )
         },
         createRate(){
             this.rates.push(this.newRate);
@@ -147,8 +182,7 @@ let app = new Vue({
                 rate: 0,
                 investmin: 0,
                 investmax: 0
-            };
-            
+            };            
         },
         deleteRate( $index ){
             this.rates = this.rates.filter( 
@@ -179,6 +213,7 @@ let app = new Vue({
                 this.details = index;
                 this.temp = this.users[index]
                 this.tab = 2;
+                this.getAjax("count_down", {id:index})
             }else{
                 this.details = -1;
                 this.tab = 0;
@@ -247,9 +282,11 @@ let app = new Vue({
                     break;
                 case 'wpt_investments':
                     this.investments.push( data )
-                    this.newInvestment = {
+                    this.newInvesment = {
+                        usuario: -1, 
                         fecha: '',
-                        monto: 0
+                        monto: 0,
+                        released: false
                     }
             }
         },
@@ -275,15 +312,15 @@ let app = new Vue({
                     this.newRate.id = max + 1;
                     return this.newRate;
                 case 'wpt_investments':
-                    this.newInvestment.usuario = this.temp.id;
-                    this.investments.forEach(
+                    this.newInvesment.usuario = this.temp.id;
+                    this.investments.forEach( 
                         investment => 
                         {
                             if( investment.id > max ) max = investment.id;
-                        }
+                        }    
                     );
-                    this.newInvestment.id = max + 1;
-                    return this.newInvestment;
+                    this.newInvesment.id = max + 1;
+                    return this.newInvesment;
 
             }
 
@@ -302,6 +339,7 @@ let app = new Vue({
             }else{
                 if( type == 'wpt_users') { dataSend.append('value', JSON.stringify( this.users.filter( user => user.id == $index )[0] ) ); }
                 else if( type == 'wpt_rates' ) { dataSend.append('value', JSON.stringify( this.rate.filter( rate => rate.id == $index )[0] ) ); }
+                else if( type == 'wpt_settings' ) { dataSend.append('value', JSON.stringify( this.settings ) ); }
                 //else { dataSend.append('value', JSON.stringify( this.investments.filter( investment => investment.id == $index )[0] ) ); }
             }
             const { data } = await axios.post(ajaxurl, dataSend);
@@ -371,8 +409,39 @@ let app = new Vue({
                 }    
             );
             return color;
+        },
+        async getAjax( f, $data ) {
+            let dataSend = new FormData();
+            dataSend.append('action', 'wpt_get_data_for_ajax');
+            dataSend.append('f', f );
+            dataSend.append('data', JSON.stringify( $data ) );
+            let { data } = await axios.post(ajaxurl, dataSend);
+            this.temp.count = data;
+            this.render = !! this.render;
+        },
+        nextPay(id){
+            let max = 0;
+            const {fechaCobro} = this.$options.filters;
+            fechaCobro( this.investments.filter( investment => investment.usuario == id), this.settings.tiempoCobro )
+            .forEach( ivestment => {
+                if( ivestment.cobro > max ){
+                    max = ivestment.cobro;
+                }
+            })
+            return max;
+        },
+        async saveWithWP(){
+            let dataSend = new FormData();
+            dataSend.append('action', 'wpt_save_data_with_wp');
+            dataSend.append('id', this.temp.wpid );
+            console.log( this.temp.wpid );
+            let { data } = await axios.post(ajaxurl, dataSend);
+            console.log( data );
+            if( data ) {
+                console.log()
+                this.users.push( data );
+            }
         }
-
     },
     vuetify: new Vuetify()
 });

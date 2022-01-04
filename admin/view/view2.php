@@ -81,13 +81,14 @@
                                     type="number"
                                     min="0"
                                     label="Retiro Mínimo"
-                                    v-model="rmin"
+                                    v-model="settings.rmin"
                                     append-icon="mdi-currency-usd"
                                 ></v-text-field>
                             </v-col>
                             <v-col> 
                                 <v-btn
                                     style="color: black; margin-top: 10px"
+                                    @click="reset"
                                 > Reset </v-btn>
                             </v-col>
                         </v-row>
@@ -97,13 +98,14 @@
                                     type="number"
                                     min="0"
                                     label="Plazo para Cobro"
-                                    v-model="tiempoCobro"
+                                    v-model="settings.tiempoCobro"
                                     suffix="dias"
                                 ></v-text-field>
                             </v-col>
                             <v-col> 
                                 <v-btn
                                     style="color: black; margin-top: 10px"
+                                    @click="save('wpt_settings',0)"
                                 > Enviar </v-btn>
                             </v-col>
                         </v-row>
