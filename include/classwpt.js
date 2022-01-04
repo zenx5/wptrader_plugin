@@ -1,7 +1,8 @@
 class WPTrader {
-    constructor(fields, users, investments, rates){
+    constructor(fields, users, actions, investments, rates){
         this.fields = fields;
         this.users = users;
+        this.actions = actions;
         this.rates = rates;
         this.investments = investments;
         this.investments.forEach( 
@@ -9,7 +10,7 @@ class WPTrader {
             {
                 this.investments[index].monto = parseFloat( element.monto )
             }
-        )
+        );
     }
 
     setSettings(settings) {

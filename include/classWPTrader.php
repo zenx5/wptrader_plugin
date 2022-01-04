@@ -18,6 +18,7 @@ class WP_Trader {
         'wpt_rates' => [],
         'wpt_investments' => [],
         'wpt_users' => [],
+        'wpt_actions' => [],
         'wpt_settings' => [],
         'wpt_user_fields' => [ 
             "monto" => "Monto",
@@ -54,6 +55,7 @@ class WP_Trader {
             'wpt_investments' => [],
             'wpt_settings' => [],
             'wpt_users' => [],
+            'wpt_actions' => [],
             'wpt_user_fields' => [ 
                 "monto" => "Monto",
                 "telefono" => "Telefono",
@@ -89,6 +91,7 @@ class WP_Trader {
         add_shortcode( 'wpt_get_data', array('WP_Trader', 'shortcode_get_data' ) );
         
         self::$settings['wpt_users'] = get_option('wpt_users');
+        self::$settings['wpt_actions'] = get_option('wpt_actions');
         self::$settings['wpt_investments'] = get_option('wpt_investments');
         self::$settings['wpt_settings'] = get_option('wpt_settings');
     }
@@ -366,7 +369,8 @@ class WP_Trader {
                         'postalcode' => '',
                         'telefono' => '',
                         'monto' => 0,
-                        'wpid' => $id
+                        'wpid' => $id, 
+                        'actions' => 0
                     ];
                     update_option('wpt_users', json_encode( $users ) );
                     echo json_encode([
@@ -380,7 +384,8 @@ class WP_Trader {
                         'postalcode' => '',
                         'telefono' => '',
                         'monto' => 0,
-                        'wpid' => $id
+                        'wpid' => $id,
+                        'actions' => 0
                     ]);
                 }
             }
@@ -439,6 +444,7 @@ class WP_Trader {
     public static function create_db(){
         self::update_settings('wpt_rates', array() );
         self::update_settings('wpt_users', array() );
+        self::update_settings('wpt_actions', array() );
         self::update_settings('wpt_investments', array() );
         self::update_settings('wpt_settings', array(
             array(
@@ -625,7 +631,13 @@ class WP_Trader {
             ?>
             // Obtenemos los usuarios de worpress y le aplicamos JSON.parse para convertirlo de string a object
             let $userswp = JSON.parse('<?= json_encode( get_users('role=subscriber') ); ?>')
-            let $t = new WPTrader(<?=self::get('wpt_user_fields',false)?>,<?=self::get('wpt_users', false)?>,<?=self::get('wpt_investments',false)?>,<?=self::get('wpt_rates',false)?>);
+            let $t = new WPTrader(
+                <?=self::get('wpt_user_fields',false)?>,
+                <?=self::get('wpt_users', false)?>,
+                <?=self::get('wpt_actions', false)?>,
+                <?=self::get('wpt_investments',false)?>,
+                <?=self::get('wpt_rates',false)?>
+            );
             $t.setSettings(<?=self::get('wpt_settings',false)?>)
             </script>
         <?php
