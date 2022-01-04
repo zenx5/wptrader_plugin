@@ -16,14 +16,14 @@ let app = new Vue({
                 { text: "Label" , value: "label", align: "center" },
                 { text: "Enable" , value: "enable", align: "center" },
             ],
-            headerInvesment: [
+            headerInvestment: [
                 { text: "Fecha de Inicio" , value: "fecha", align: "center" },
                 { text: "Fecha de Cobro" , value: "fechacobro", align: "center" },
                 { text: "Monto ($)" , value: "monto", align: "center" },
                 { text: "Dias para cobrar" , value: "cobro", align: "center" },
                 { text: "Accion" , value: "action", align: "center" }
             ],
-            newInvesment: {},
+            newInvestment: {},
             investments: [],
             headerSetting:[
                 { text: "Color" , value: "color", align: "center" },
@@ -247,7 +247,7 @@ let app = new Vue({
                     break;
                 case 'wpt_investments':
                     this.investments.push( data )
-                    this.newInvesment = {
+                    this.newInvestment = {
                         fecha: '',
                         monto: 0
                     }
@@ -275,8 +275,15 @@ let app = new Vue({
                     this.newRate.id = max + 1;
                     return this.newRate;
                 case 'wpt_investments':
-                    this.newInvesment.usuario = this.temp.id;
-                    return this.newInvesment;
+                    this.newInvestment.usuario = this.temp.id;
+                    this.investments.forEach(
+                        investment => 
+                        {
+                            if( investment.id > max ) max = investment.id;
+                        }
+                    );
+                    this.newInvestment.id = max + 1;
+                    return this.newInvestment;
 
             }
 
@@ -326,6 +333,10 @@ let app = new Vue({
                             investmax: 0
                         });
                     }                    
+                }
+                else if ( type == 'wpt_investments' ) {
+                    console.log(this.investments,$index)
+                    this.investments = this.investments.filter( investment => investment.id != $index );
                 }
             }
             this.temp = {

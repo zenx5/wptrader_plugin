@@ -122,10 +122,10 @@ class WP_Trader {
 
 
     public static function get_time($id) {        
-        $invesments = json_decode( get_option('wpt_investments'), true );
-        foreach( $invesments as $invesment ) {
-            if( $invesment['usuario'] == $id ) {
-                $end = date_create( $invesment['fecha'] );
+        $investments = json_decode( get_option('wpt_investments'), true );
+        foreach( $investments as $investment ) {
+            if( $investment['usuario'] == $id ) {
+                $end = date_create( $investment['fecha'] );
                 $end->add( new DateInterval('P180D') );
                 return date_diff( $end, date_create() );
             }

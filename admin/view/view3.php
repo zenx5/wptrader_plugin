@@ -54,12 +54,12 @@
                         <v-text-field
                             type="date"
                             label="Fecha"
-                            v-model="newInvesment.fecha">
+                            v-model="newInvestment.fecha">
                         </v-text-field>
                         <v-text-field
                             type="number"
                             label="Monto"
-                            v-model="newInvesment.monto"
+                            v-model="newInvestment.monto"
                             append-icon="mdi-currency-usd">
                         </v-text-field>
                     </v-col>
@@ -72,7 +72,7 @@
             <v-row>
                 <v-col cols="12">
                     <v-data-table
-                        :headers="headerInvesment"
+                        :headers="headerInvestment"
                         :items="investments | forKey('usuario',temp.id) | fechaCobro(tiempoCobro)"
                     >
                     <template #item.fecha="{item}">
@@ -91,7 +91,7 @@
                         <v-icon 
                             @click="cobrar"
                             :disabled="item.cobro>0">mdi-content-save</v-icon>
-                        <v-icon>mdi-delete</v-icon>
+                        <v-icon @click="del('wpt_investments',item.id)">mdi-delete</v-icon>
                     </template>
                     </v-data-table>
                 </v-col>
