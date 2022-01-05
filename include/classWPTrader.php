@@ -87,6 +87,7 @@ class WP_Trader {
         add_action( 'wp_ajax_wpt_get_data_for_ajax', array('WP_Trader', 'wpt_get_data_for_ajax') );
         //add_action( 'wp_ajax_wpt_edit_data', array('WP_Trader', 'wpt_edit_data') );
         add_shortcode( 'wpt_user_name', array('WP_Trader', 'shortcode_user_name' ) );
+        add_shortcode( 'wpt_info', array('WP_Trader', 'shortcode_info' ) );
         add_shortcode( 'wpt_count_down', array('WP_Trader', 'shortcode_count_down' ) );
         add_shortcode( 'wpt_get_data', array('WP_Trader', 'shortcode_get_data' ) );
         
@@ -95,6 +96,64 @@ class WP_Trader {
         self::$settings['wpt_investments'] = get_option('wpt_investments');
         self::$settings['wpt_settings'] = get_option('wpt_settings');
     }
+
+    public static function shortcode_info( $atts, $content ) {
+        if( ! isset( $atts['info'] ) ) return "";
+
+        if( $atts['info'] == 'actions' ) {
+            $actions = json_decode( get_option('wpt_actions'), true);
+            ob_start();
+            ?>            
+                <ul>
+                    <?php foreach( $actions as $action ): ?>
+                        <li>
+                            <?php if($action['foot']==-1): ?>
+                                Menor a <?=$action['head']?>: <b><?=$action['precio']?>$</b>
+                            <?php elseif($action['head']==-1): ?>
+                                Mayor a <?=$action['foot']?>: <b><?=$action['precio']?>$</b>
+                            <?php else: ?>
+                                Desde <?=$action['foot']?> hasta <?=$action['head']?>: <b><?=$action['precio']?>$</b>
+                            <?php endif; ?>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php
+            
+            $list = ob_get_contents();
+            ob_end_clean();            
+
+            if( $content != '' ) {
+                $output = $content;
+                str_replace("{{lista}}",$list, $output );
+            }else{
+                $output = $list;
+            }
+            return $output;
+        }elseif( $atts['info'] == 'rates' ) {
+            $invesments = json_decode( get_option('wpt_rates'), true);
+            ob_start();
+            ?>            
+                <ul>
+                    <?php foreach( $invesments as $invesment ): ?>
+                        <li>Desde <?=$invesment['investmin']?>$ hasta <?=$invesment['investmax']?>$: <b><?=$invesment['rate']?>%</b></li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php
+            
+            $list = ob_get_contents();
+            ob_end_clean();            
+
+            if( $content != '' ) {
+                $output = $content;
+                str_replace("{{lista}}",$list, $output );
+            }else{
+                $output = $list;
+            }
+            return $output;
+        }
+        else return "";
+    }
+
 
     public static function shortcode_get_data( $atts, $content ) {
         $id = isset($atts['id'])?isset($atts['id']):self::get_id( get_current_user_id() );
@@ -133,8 +192,22 @@ class WP_Trader {
             if( $user[ 'id' ] == $id ) {
                 if ( !isset($user[ $field ]) ) {
                     return "campo no existente";
-                };
-                return $user[ $field ];
+                }
+                else if( $field == 'actions' ){
+                    $details = isset( $atts['details'] )?$atts['details']:'numero';
+                    $value = 0;
+                    foreach( $user[ $field ] as $action ) {
+                        if( $details == 'numero' ){
+                            $value += $action['cantidad'];
+                        }elseif( $details == 'valor' ){
+                            $value += $action['cantidad']*$action['precio'];
+                        }
+                    }
+                    return $value;
+                }
+                else{
+                    return $user[ $field ];
+                }
             }
         }
         return 'usuario no existente';
@@ -471,10 +544,14 @@ class WP_Trader {
     public static function dependecies(){
         ?>
             <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
+            <link href="../include/css/materialdesignicons.min.css" rel="stylesheet">
             <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
             <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+            <script src="../include/js/vue@2.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+            <script src="../include/js/axios.min.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+            <script src="../include/js/vuetify.js"></script>
             <script type="text/javascript">
                 // Create a class for the element
                 class CountDown extends HTMLElement {
