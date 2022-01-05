@@ -172,6 +172,19 @@ let app = new Vue({
             })
             return valid;
         },
+        validateRateRange(){
+            let min = parseFloat( this.newRate.investmin ),
+                max = parseFloat( this.newRate.investmax ),
+                valid = false;
+            
+            this.rates.forEach( (rate, index) => {
+                if( index != 0 ) {
+                    if(( min >= parseFloat(rate.investmin) )&&( min <= parseFloat(rate.investmax) )) {valid = true;}
+                    if(( max >= parseFloat(rate.investmin) )&&( max <= parseFloat(rate.investmax) )) {valid = true;}
+                }
+            })
+            return valid;
+        },
         validated( type ) {
             let valid = true;
             switch( type ){
