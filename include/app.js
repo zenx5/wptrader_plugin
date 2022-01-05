@@ -31,6 +31,12 @@ let app = new Vue({
                 monto: 0,
                 released: false
             },
+            newActions: {
+                id: -1,
+                precio: 0,
+                foot: 0,
+                head: 0
+            },
             investments: [],
             headerSetting:[
                 { text: "Color" , value: "color", align: "center" },
@@ -40,11 +46,24 @@ let app = new Vue({
                 { text: "Accion" , value: "action", align: "center" }
             ],
             headerAction:[
-                { text: "Precio de la accion" , value: "price", align: "center" },
-                { text: "Numero de acciones minimo" , value: "actionMin", align: "center" },
-                { text: "Numero de acciones maximo" , value: "actionMax", align: "center" }
+                { text: "Precio de la accion" , value: "precio", align: "center" },
+                { text: "Numero de acciones minimo" , value: "foot", align: "center" },
+                { text: "Numero de acciones maximo" , value: "head", align: "center" },
+                { text: "Accion" , value: "action", align: "center" }
             ],
-            actions: [],
+            actions: [
+                {
+                    id: -1,
+                    precio: 0,
+                    foot: 0,
+                    head: 0
+                },
+                {
+                id: 1,
+                precio: 100,
+                foot: 10,
+                head: 50
+            }],
             rates: [
                 {
                     color: "#fff",

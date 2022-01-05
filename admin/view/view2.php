@@ -112,34 +112,34 @@
                             :headers="headerAction"
                             :items="actions"
                         >
-                            <template #item.price="{item, index}">
+                            <template #item.precio="{item, index}">
                                 <v-text-field 
                                     type="number" 
-                                    v-if="index==0" 
+                                    v-if="index==0"
                                     min="0"
-                                    max="100"
                                     step="0.01"
-                                    append-icon="mdi-percent"
-                                ></v-text-field>
-                                <span v-else>{{item.rate}}<v-icon>mdi-percent</v-icon></span>
-                            </template>
-                            <template #item.investmin="{item, index}">
-                                <v-text-field 
-                                    type="number" 
-                                    v-if="index==0" 
-                                    min="0"
+                                    v-model="newActions.precio"
                                     append-icon="mdi-currency-usd"
                                 ></v-text-field>
-                                <span v-else>{{item.investmin}}<v-icon>mdi-currency-usd</v-icon></span>
+                                <span v-else>{{item.precio}}<v-icon>mdi-currency-usd</v-icon></span>
                             </template>
-                            <template #item.investmax="{item, index}">
+                            <template #item.foot="{item, index}">
+                                <v-text-field 
+                                    type="number" 
+                                    v-if="index==0" 
+                                    min="0" 
+                                    v-model="newActions.foot"
+                                ></v-text-field>
+                                <span v-else>{{item.foot}}</span>
+                            </template>
+                            <template #item.head="{item, index}">
                                 <v-text-field 
                                     v-if="index==0"
                                     type="number"
                                     min="0"
-                                    append-icon="mdi-currency-usd"
+                                    v-model="newActions.head"
                                 ></v-text-field>
-                                <span v-else>{{item.investmax}}<v-icon>mdi-currency-usd</v-icon></span>
+                                <span v-else>{{item.head}}</span>
                             </template>
                         </v-data-table>
                     </v-col>
