@@ -82,7 +82,7 @@
             <v-row>
                 <v-col cols="12">
                     <v-data-table
-                        :headers="headerInvesment"
+                        :headers="headerInvestment"
                         :items="investments | forKey('usuario',temp.id) | fechaCobro(settings.tiempoCobro)"
                     >
                     <template #item.fecha="{item}" >

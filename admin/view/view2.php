@@ -69,9 +69,6 @@
                     <v-col cols="5">
                         <h3>Configuraciones generales</h3>
                     </v-col>
-                    <v-col cols="5">
-                        <h3>Paises</h3>
-                    </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="5">
@@ -112,19 +109,63 @@
                     </v-col>
                     <v-col>
                         <v-data-table
-                            :headers="headerCountrie"
-                            :items="countries"
-                            class="elevation-1"
+                            :headers="headerAction"
+                            :items="actions"
                         >
-                        <template #item.enable="{item}">
-                            <v-checkbox
-                                v-model="item.enable"
-                                class="pa-3"
-                                @click="localStorage.setItem('wpt_countries', JSON.stringify(countries))"
-                            ></v-checkbox>
-                        </template>
-                    </v-data-table>
+                            <template #item.price="{item, index}">
+                                <v-text-field 
+                                    type="number" 
+                                    v-if="index==0" 
+                                    min="0"
+                                    max="100"
+                                    step="0.01"
+                                    append-icon="mdi-percent"
+                                ></v-text-field>
+                                <span v-else>{{item.rate}}<v-icon>mdi-percent</v-icon></span>
+                            </template>
+                            <template #item.investmin="{item, index}">
+                                <v-text-field 
+                                    type="number" 
+                                    v-if="index==0" 
+                                    min="0"
+                                    append-icon="mdi-currency-usd"
+                                ></v-text-field>
+                                <span v-else>{{item.investmin}}<v-icon>mdi-currency-usd</v-icon></span>
+                            </template>
+                            <template #item.investmax="{item, index}">
+                                <v-text-field 
+                                    v-if="index==0"
+                                    type="number"
+                                    min="0"
+                                    append-icon="mdi-currency-usd"
+                                ></v-text-field>
+                                <span v-else>{{item.investmax}}<v-icon>mdi-currency-usd</v-icon></span>
+                            </template>
+                        </v-data-table>
                     </v-col>
+                </v-row>
+                <v-row>
+                    <v-col>
+                        <v-row cols="5">
+                            <h3>Paises</h3>
+                        </v-row>
+                        <v-row>
+                            <v-data-table
+                                :headers="headerCountrie"
+                                :items="countries"
+                                class="elevation-1"
+                            >
+                                <template #item.enable="{item}">
+                                    <v-checkbox
+                                        v-model="item.enable"
+                                        class="pa-3"
+                                        @click="localStorage.setItem('wpt_countries', JSON.stringify(countries))"
+                                    ></v-checkbox>
+                                </template>
+                            </v-data-table>
+                        </v-row>
+                    </v-col>
+                    <v-col><v-col>
                 </v-row>
             </v-container>
         </v-form>

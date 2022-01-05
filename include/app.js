@@ -25,7 +25,7 @@ let app = new Vue({
                 { text: "Dias para cobrar" , value: "cobro", align: "center" },
                 { text: "Accion" , value: "action", align: "center" }
             ],
-            newInvesment: {
+            newInvestment: {
                 usuario: -1, 
                 fecha: '',
                 monto: 0,
@@ -39,6 +39,12 @@ let app = new Vue({
                 { text: "Inversion Máxima ($)" , value: "investmax", align: "center" },
                 { text: "Accion" , value: "action", align: "center" }
             ],
+            headerAction:[
+                { text: "Precio de la accion" , value: "price", align: "center" },
+                { text: "Numero de acciones minimo" , value: "actionMin", align: "center" },
+                { text: "Numero de acciones maximo" , value: "actionMax", align: "center" }
+            ],
+            actions: [],
             rates: [
                 {
                     color: "#fff",
@@ -171,7 +177,7 @@ let app = new Vue({
         },
         cobrar( item ){
             item.released = true;
-            this.newInvesment = item;
+            this.newInvestment = item;
             this.save('wpt_investments', item.id )
         },
         createRate(){
@@ -282,7 +288,7 @@ let app = new Vue({
                     break;
                 case 'wpt_investments':
                     this.investments.push( data )
-                    this.newInvesment = {
+                    this.newInvestment = {
                         usuario: -1, 
                         fecha: '',
                         monto: 0,
@@ -312,15 +318,15 @@ let app = new Vue({
                     this.newRate.id = max + 1;
                     return this.newRate;
                 case 'wpt_investments':
-                    this.newInvesment.usuario = this.temp.id;
+                    this.newInvestment.usuario = this.temp.id;
                     this.investments.forEach( 
                         investment => 
                         {
                             if( investment.id > max ) max = investment.id;
                         }    
                     );
-                    this.newInvesment.id = max + 1;
-                    return this.newInvesment;
+                    this.newInvestment.id = max + 1;
+                    return this.newInvestment;
 
             }
 
