@@ -106,6 +106,16 @@
                                 > Enviar </v-btn>
                             </v-col>
                         </v-row>
+                        <v-row>
+                            <v-col cols="6">
+                                <v-text-field 
+                                    type="number"
+                                    min="0"
+                                    label="Numero Maximo de Acciones"
+                                    v-model="settings.actionMax"
+                                ></v-text-field>
+                            </v-col>
+                        </v-row>
                     </v-col>
                     <v-col>
                         <v-data-table
@@ -128,6 +138,7 @@
                                     type="number" 
                                     v-if="index==0" 
                                     min="0" 
+                                    :max="settings.actionMax"
                                     v-model="newActions.foot"
                                 ></v-text-field>
                                 <span v-else>{{item.foot}}</span>
@@ -137,9 +148,14 @@
                                     v-if="index==0"
                                     type="number"
                                     min="0"
+                                    :max="settings.actionMax"
                                     v-model="newActions.head"
                                 ></v-text-field>
                                 <span v-else>{{item.head}}</span>
+                            </template>
+                            <template #item.action="{item, index}">
+                                <v-icon v-if="index==0" @click="save('wpt_actions',-1)" :disabled="validateActionRange()">mdi-content-save</v-icon>
+                                <v-icon v-else @click="del('wpt_actions',item.id)">mdi-delete</v-icon>
                             </template>
                         </v-data-table>
                     </v-col>

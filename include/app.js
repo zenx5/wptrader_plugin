@@ -8,7 +8,8 @@ let app = new Vue({
             tab: 0,
             settings: {
                 tiempoCobro: 180,
-                rmin: 30
+                rmin: 30,
+                actionMax: 100
             },            
             details: -1,
             editRow: -1,
@@ -51,19 +52,7 @@ let app = new Vue({
                 { text: "Numero de acciones maximo" , value: "head", align: "center" },
                 { text: "Accion" , value: "action", align: "center" }
             ],
-            actions: [
-                {
-                    id: -1,
-                    precio: 0,
-                    foot: 0,
-                    head: 0
-                },
-                {
-                id: 1,
-                precio: 100,
-                foot: 10,
-                head: 50
-            }],
+            actions: [],
             rates: [
                 {
                     color: "#fff",
@@ -128,13 +117,12 @@ let app = new Vue({
         
         this.users = $t.users;
         this.rates = $t.rates;
+        this.actions = $t.actions;
         this.investments = $t.investments;
         this.rates.unshift(this.newRate)
+        console.log( this.actions )
+        this.actions.unshift(this.newActions)
         this.settings = $t.settings[0];
-        console.log(this.settings)
-        /*this.rmin = $t.settings.rmin;
-        this.tiempoCobro = $t.settings.tiempoCobro;
-        this.countrySelect = $t.settings.countrySelect;*/
         await this.getData();
     },
     filters: {
@@ -171,6 +159,19 @@ let app = new Vue({
         }
     },
     methods: {
+        validateActionRange(){
+            let foot = parseInt( this.newActions.foot ),
+                head = parseInt( this.newActions.head ),
+                valid = false;
+            
+            this.actions.forEach( (action, index) => {
+                if( index != 0 ) {
+                    if(( foot >= parseInt(action.foot) )&&( foot <= parseInt(action.head) )) {valid = true;}
+                    if(( head >= parseInt(action.foot) )&&( head <= parseInt(action.head) )) {valid = true;}
+                }
+            })
+            return valid;
+        },
         validated( type ) {
             let valid = true;
             switch( type ){
@@ -192,6 +193,7 @@ let app = new Vue({
         reset() {
             this.settings.rmin = 30;
             this.settings.tiempoCobro = 180;
+            this.settings.actionMax = 100;
 
         },
         cobrar( item ){
@@ -305,6 +307,26 @@ let app = new Vue({
                         investmax: 0
                     }
                     break;
+                case 'wpt_actions': 
+                    if( id != -1 ){
+                        let index = -1;
+                        this.actions.forEach( 
+                            (action, $index) => 
+                            {
+                                if( action.id == id ) index = $index;
+                            }
+                        );
+                        this.actions[index] = data;
+                    }else{
+                        this.actions.push( data );
+                    }
+                    this.newActions = {
+                        id: -1,
+                        precio: 0,
+                        foot: 0,
+                        head: 0
+                    }
+                    break;
                 case 'wpt_investments':
                     this.investments.push( data )
                     this.newInvestment = {
@@ -336,6 +358,15 @@ let app = new Vue({
                     );
                     this.newRate.id = max + 1;
                     return this.newRate;
+                case 'wpt_actions': 
+                    this.actions.forEach( 
+                        action => 
+                        {
+                            if( action.id > max ) max = action.id;
+                        }    
+                    );
+                    this.newActions.id = max + 1;
+                    return this.newActions;
                 case 'wpt_investments':
                     this.newInvestment.usuario = this.temp.id;
                     this.investments.forEach( 
@@ -346,7 +377,6 @@ let app = new Vue({
                     );
                     this.newInvestment.id = max + 1;
                     return this.newInvestment;
-
             }
 
         },
@@ -394,6 +424,17 @@ let app = new Vue({
                             rate: 0,
                             investmin: 0,
                             investmax: 0
+                        });
+                    }                    
+                }
+                else if( type == 'wpt_actions' ){
+                    this.actions = this.actions.filter( action => action.id != $index );
+                    if( this.actions.length == 0){
+                        this.actions.push({
+                            id: -1,
+                            precio: 0,
+                            foot: 0,
+                            head: 0
                         });
                     }                    
                 }

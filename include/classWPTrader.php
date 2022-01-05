@@ -524,6 +524,7 @@ class WP_Trader {
                 "id" => 0,
                 "tiempoCobro" => 180,
                 "rmin" => 30,
+                "actionMax" => 100,
                 "contrySelect" => ["all"]
             )
         ) );
