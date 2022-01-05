@@ -18,18 +18,24 @@ let app = new Vue({
                 { text: "Label" , value: "label", align: "center" },
                 { text: "Enable" , value: "enable", align: "center" },
             ],
-            headerInvesment: [
+            headerInvestment: [
                 { text: "Fecha de Inicio" , value: "fecha", align: "center" },
                 { text: "Fecha de Cobro" , value: "fechacobro", align: "center" },
                 { text: "Monto ($)" , value: "monto", align: "center" },
                 { text: "Dias para cobrar" , value: "cobro", align: "center" },
                 { text: "Accion" , value: "action", align: "center" }
             ],
-            newInvesment: {
+            newInvestment: {
                 usuario: -1, 
                 fecha: '',
                 monto: 0,
                 released: false
+            },
+            newActions: {
+                id: -1,
+                precio: 0,
+                foot: 0,
+                head: 0
             },
             investments: [],
             headerSetting:[
@@ -39,6 +45,25 @@ let app = new Vue({
                 { text: "Inversion Máxima ($)" , value: "investmax", align: "center" },
                 { text: "Accion" , value: "action", align: "center" }
             ],
+            headerAction:[
+                { text: "Precio de la accion" , value: "precio", align: "center" },
+                { text: "Numero de acciones minimo" , value: "foot", align: "center" },
+                { text: "Numero de acciones maximo" , value: "head", align: "center" },
+                { text: "Accion" , value: "action", align: "center" }
+            ],
+            actions: [
+                {
+                    id: -1,
+                    precio: 0,
+                    foot: 0,
+                    head: 0
+                },
+                {
+                id: 1,
+                precio: 100,
+                foot: 10,
+                head: 50
+            }],
             rates: [
                 {
                     color: "#fff",
@@ -171,7 +196,7 @@ let app = new Vue({
         },
         cobrar( item ){
             item.released = true;
-            this.newInvesment = item;
+            this.newInvestment = item;
             this.save('wpt_investments', item.id )
         },
         createRate(){
@@ -282,7 +307,7 @@ let app = new Vue({
                     break;
                 case 'wpt_investments':
                     this.investments.push( data )
-                    this.newInvesment = {
+                    this.newInvestment = {
                         usuario: -1, 
                         fecha: '',
                         monto: 0,
@@ -312,15 +337,15 @@ let app = new Vue({
                     this.newRate.id = max + 1;
                     return this.newRate;
                 case 'wpt_investments':
-                    this.newInvesment.usuario = this.temp.id;
+                    this.newInvestment.usuario = this.temp.id;
                     this.investments.forEach( 
                         investment => 
                         {
                             if( investment.id > max ) max = investment.id;
                         }    
                     );
-                    this.newInvesment.id = max + 1;
-                    return this.newInvesment;
+                    this.newInvestment.id = max + 1;
+                    return this.newInvestment;
 
             }
 
@@ -371,6 +396,10 @@ let app = new Vue({
                             investmax: 0
                         });
                     }                    
+                }
+                else if ( type == 'wpt_investments' ) {
+                    console.log(this.investments,$index)
+                    this.investments = this.investments.filter( investment => investment.id != $index );
                 }
             }
             this.temp = {

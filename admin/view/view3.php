@@ -64,12 +64,12 @@
                         <v-text-field
                             type="date"
                             label="Fecha"
-                            v-model="newInvesment.fecha">
+                            v-model="newInvestment.fecha">
                         </v-text-field>
                         <v-text-field
                             type="number"
                             label="Monto"
-                            v-model="newInvesment.monto"
+                            v-model="newInvestment.monto"
                             append-icon="mdi-currency-usd">
                         </v-text-field>
                     </v-col>
@@ -82,7 +82,7 @@
             <v-row>
                 <v-col cols="12">
                     <v-data-table
-                        :headers="headerInvesment"
+                        :headers="headerInvestment"
                         :items="investments | forKey('usuario',temp.id) | fechaCobro(settings.tiempoCobro)"
                     >
                     <template #item.fecha="{item}" >

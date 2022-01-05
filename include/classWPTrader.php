@@ -173,7 +173,7 @@ class WP_Trader {
                     return self::get_total_avalaible($id);
                     break;
                 case "inversion":
-                    return self::get_total_invesment($id);
+                    return self::get_total_investment($id);
                     break;
                 case "recibidos":
                     return self::get_total_released($id);
@@ -233,16 +233,16 @@ class WP_Trader {
     }
     
     public static function get_total_avalaible($id){
-        $invesments = json_decode( get_option('wpt_investments'), true );
+        $investments = json_decode( get_option('wpt_investments'), true );
         $settings = json_decode( get_option('wpt_settings'), true );
         $total = 0;
-        foreach( $invesments as $invesment ) {
-            if( $invesment['usuario'] == $id ) {
-                if( !!! $invesment['released']  ) {
-                    if( self::get_time($id, $invesment['id'])->days <= ($settings[0]['tiempoCobro']-$settings[0]['rmin']) ) {
+        foreach( $investments as $investment ) {
+            if( $investment['usuario'] == $id ) {
+                if( !!! $investment['released']  ) {
+                    if( self::get_time($id, $investment['id'])->days <= ($settings[0]['tiempoCobro']-$settings[0]['rmin']) ) {
                         $days = $settings[0]['tiempoCobro'] - self::get_time($id)->days;
                         $days = $days>0?$days:0;
-                        $total += $days * self::calculate_gain( (float)$invesment['monto'] );
+                        $total += $days * self::calculate_gain( (float)$investment['monto'] );
                     }
                 }
             }
@@ -254,24 +254,24 @@ class WP_Trader {
     }
 
     public static function get_total_released($id){
-        $invesments = json_decode( get_option('wpt_investments'), true );
+        $investments = json_decode( get_option('wpt_investments'), true );
         $total = 0;
-        foreach( $invesments as $invesment ) {
-            if( $invesment['usuario'] == $id ) {
-                if( !! $invesment['released']  ) {
-                    $total += (float) $invesment['monto'];
+        foreach( $investments as $investment ) {
+            if( $investment['usuario'] == $id ) {
+                if( !! $investment['released']  ) {
+                    $total += (float) $investment['monto'];
                 }
             }
         }
         return $total;
     }
 
-    public static function get_total_invesment($id){
-        $invesments = json_decode( get_option('wpt_investments'), true );
+    public static function get_total_investment($id){
+        $investments = json_decode( get_option('wpt_investments'), true );
         $total = 0;
-        foreach( $invesments as $invesment ) {
-            if( $invesment['usuario'] == $id ) {
-                $total += (float) $invesment['monto'];
+        foreach( $investments as $investment ) {
+            if( $investment['usuario'] == $id ) {
+                $total += (float) $investment['monto'];
             }
         }
         return $total;
@@ -280,13 +280,13 @@ class WP_Trader {
     public static function get_time($id, $id_investment = null ) {
         $times = [];
         $max = null;
-        $invesments = json_decode( get_option('wpt_investments'), true );
-        foreach( $invesments as $invesment ) {
-            if( $invesment['usuario'] == $id ) {
-                $end = date_create( $invesment['fecha'] );
+        $investments = json_decode( get_option('wpt_investments'), true );
+        foreach( $investments as $investment ) {
+            if( $investment['usuario'] == $id ) {
+                $end = date_create( $investment['fecha'] );
                 $end->add( new DateInterval('P180D') );
-                $times[ $invesment['id'] ] = date_diff( $end, date_create() );
-                $max = $times[ $invesment['id'] ];
+                $times[ $investment['id'] ] = date_diff( $end, date_create() );
+                $max = $times[ $investment['id'] ];
             }
         }
         if( $id_investment ) {
@@ -402,8 +402,8 @@ class WP_Trader {
             case "get_total_avalaible":
                 echo self::get_total_avalaible($id);
                 break;
-            case "get_total_invesment":
-                echo self::get_total_invesment($id);
+            case "get_total_investment":
+                echo self::get_total_investment($id);
                 break;
             case "get_total_released":
                 echo self::get_total_released($id);
