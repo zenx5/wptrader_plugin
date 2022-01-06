@@ -559,6 +559,11 @@ class WP_Trader {
             <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
             
+            <link href="https://kavavdigital.com/pluginariel/materialdesignicons.min.css" rel="stylesheet">
+            <link href="https://kavavdigital.com/pluginariel/vuetify.min.css" rel="stylesheet">
+            <script src="https://kavavdigital.com/pluginariel/npm/vue@2"></script>
+            <script src="https://kavavdigital.com/pluginariel/axios.min.js"></script>
+            <script src="https://kavavdigital.com/pluginariel/vuetify.js"></script>
             <script type="text/javascript">
                 // Create a class for the element
                 class CountDown extends HTMLElement {
