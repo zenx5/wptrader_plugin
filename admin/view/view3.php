@@ -69,6 +69,7 @@
                         <v-text-field
                             type="number"
                             label="Monto"
+                            min="0"
                             v-model="newInvestment.monto"
                             append-icon="mdi-currency-usd">
                         </v-text-field>
@@ -109,6 +110,11 @@
                             <v-chip color="#0f0" v-else>Por Cobrar</v-chip>
                         </span>
                     </template>
+                    <template #item.generado="{item}">
+                        <span>
+                            {{porCobrar( settings.tiempoCobro-item.cobro, item.monto, 0 )}}
+                        </span>
+                    </template>
                     <template #item.action="{item}">
                         <v-icon 
                             @click="cobrar"
@@ -117,6 +123,9 @@
                         <v-icon 
                             @click="del('wpt_investments', item.id)"
                             v-if="!item.released">mdi-delete</v-icon>
+                        <v-icon 
+                            v-if="!item.released">mdi-content-save
+                        </v-icon>
                     </template>
                     </v-data-table>
                 </v-col>

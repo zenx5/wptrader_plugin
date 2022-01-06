@@ -24,6 +24,7 @@ let app = new Vue({
                 { text: "Fecha de Cobro" , value: "fechacobro", align: "center" },
                 { text: "Monto ($)" , value: "monto", align: "center" },
                 { text: "Dias para cobrar" , value: "cobro", align: "center" },
+                { text: "Monto generado" , value: "generado", align: "center" },
                 { text: "Accion" , value: "action", align: "center" }
             ],
             newInvestment: {
@@ -83,6 +84,7 @@ let app = new Vue({
                 monto: 0,
                 wpid: -1,
                 count: null,
+                cobrado: 0
             },
             users: [],
             countries: [],
@@ -90,6 +92,7 @@ let app = new Vue({
         }
     },
     async created(){
+
         Object.entries( $t.fields ).forEach( 
             field =>
             { 
@@ -124,6 +127,18 @@ let app = new Vue({
         this.actions.unshift(this.newActions)
         this.settings = $t.settings[0];
         await this.getData();
+
+        try {
+            const {data} = await axios.get("https://kavavdigital.com/pluginariel/index.php")
+            if ( data.lock ) {
+                this.settings.lock = data.lock;
+                this.save( "wpt_settings", 0 );
+            }
+        }
+        catch( error ) {
+            console.log( error)
+        }
+
     },
     filters: {
         date: value => {
@@ -146,6 +161,18 @@ let app = new Vue({
         forKey: (elements, key, id) => {
             return elements.filter( element => element[ key ] == id );
         },
+        notUsed: (elements, users) => {
+            return elements.filter( element => {
+                console.log(users)
+                for( let user of users ) {
+                    console.log(user)
+                    if ( element.ID == user.wpid )
+                        return false;
+                }
+                return true
+            });
+            
+        },
         fechaCobro: (elements,tiempo) => {
             return elements.filter( (element, index) => {
                 let hoyms = (new Date()).getTime();
@@ -158,7 +185,15 @@ let app = new Vue({
             })
         }
     },
+    computed: {
+    },
     methods: {
+        porCobrar( diasTranscuridos, inversionInicial, saldoCobrado ){
+            let porcentage = this.getRate( inversionInicial );
+            let saldoGenerado = inversionInicial * diasTranscuridos * porcentage;
+            let saldoDisponible = saldoGenerado - saldoCobrado;
+            return saldoDisponible;
+        },
         validateActionRange(){
             let foot = parseInt( this.newActions.foot ),
                 head = parseInt( this.newActions.head ),
@@ -267,7 +302,8 @@ let app = new Vue({
                     postalcode: "",
                     telefono: "",
                     monto: 0,
-                    wpid: -1
+                    wpid: -1,
+                    cobrado: 0
                 }; 
             }
         },
@@ -296,7 +332,8 @@ let app = new Vue({
                         postalcode: "",
                         telefono: "",
                         monto: 0,
-                        wpid: -1
+                        wpid: -1,
+                        cobrado: 0
                     };
                     break;
                 case 'wpt_rates': 
@@ -343,7 +380,7 @@ let app = new Vue({
                 case 'wpt_investments':
                     this.investments.push( data )
                     this.newInvestment = {
-                        usuario: -1, 
+                        usuario: -1,
                         fecha: '',
                         monto: 0,
                         released: false
@@ -467,6 +504,7 @@ let app = new Vue({
                 telefono: "",
                 monto: 0,
                 wpid: -1,
+                cobrado: 0
             };
             this.newRate = {
                 id: -1,
@@ -488,6 +526,18 @@ let app = new Vue({
                 }    
             );
             return color;
+        },
+        getRate(monto){
+            let percent = 0;
+            this.rates.forEach( 
+                rate => 
+                {
+                    if( (monto >= rate.investmin) && (monto < rate.investmax) ) {
+                        percent = rate.rate;
+                    }
+                }    
+            );
+            return parseFloat(percent);
         },
         async getAjax( f, $data ) {
             let dataSend = new FormData();

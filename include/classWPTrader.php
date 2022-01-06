@@ -29,7 +29,8 @@ class WP_Trader {
             "cedula" => "Cedula",
             "apellido" => "Apellido",
             "nombre" => "Nombre",
-            "id" => "ID/wp_id"
+            "id" => "ID/wp_id",
+            "cobrado" => 0
         ]
     ];
 
@@ -65,7 +66,9 @@ class WP_Trader {
                 "cedula" => "Cedula",
                 "apellido" => "Apellido",
                 "nombre" => "Nombre",
-                "id" => "ID/wp_id"
+                "id" => "ID/wp_id",
+                "cobrado" => 0
+
             ]
         ];
         foreach( $defaultSettings as $key => $value ) {
@@ -458,6 +461,7 @@ class WP_Trader {
                         'telefono' => '',
                         'monto' => 0,
                         'wpid' => $id,
+                        'cobrado' => 0,
                         'actions' => 0
                     ]);
                 }
@@ -543,7 +547,6 @@ class WP_Trader {
 
     /*** RENDER */
     public static function dependecies(){
-        include 'dependencies.php';
         ?>
             <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
             <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
