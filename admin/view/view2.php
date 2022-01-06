@@ -56,7 +56,7 @@
                                 <span v-else>{{item.investmax}}<v-icon>mdi-currency-usd</v-icon></span>
                             </template>
                             <template #item.action="{item, index}">
-                                <v-icon v-if="index==0" @click="save('wpt_rates',-1)">mdi-content-save</v-icon>
+                                <v-icon v-if="index==0" @click="save('wpt_rates',-1)" :validated="validateRateRange">mdi-content-save</v-icon>
                                 <v-icon v-else @click="del('wpt_rates',item.id)">mdi-delete</v-icon>
                             </template>
                         </v-data-table>
