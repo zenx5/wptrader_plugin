@@ -97,7 +97,7 @@
                             v-model="currentActions"
                             :max="settings.actionMax">
                         </v-text-field>
-                        <v-btn @click="setAction" >
+                        <v-btn @click="setAction" :disabled="validateAction">
                             <v-icon>mdi-content-save</v-icon>Agregar
                         </v-btn>
                     </v-form>

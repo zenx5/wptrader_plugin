@@ -122,7 +122,6 @@ let app = new Vue({
         this.actions = $t.actions;
         this.investments = $t.investments;
         this.rates.unshift(this.newRate)
-        console.log( this.actions )
         this.actions.unshift(this.newActions)
         this.settings = $t.settings[0];
         await this.getData();
@@ -175,6 +174,12 @@ let app = new Vue({
             })
         }
     },
+    computed: {
+        validateAction(){
+            const {totalActions} = this.$options.filters;
+            return ( this.actions.length == 0) || (totalActions( this.temp.actions, 'cantidad' ) == this.settings.actionMax);
+        }
+    },
     methods: {
         validateActionRange(){
             let foot = parseInt( this.newActions.foot ),
@@ -206,7 +211,6 @@ let app = new Vue({
             let valid = true;
             switch( type ){
                 case 'wpt_users':
-
                     valid = valid && ( !!this.temp.nombre );
                     valid = valid && ( !!this.temp.apellido );
                     valid = valid && ( !!this.temp.cedula );
@@ -413,7 +417,6 @@ let app = new Vue({
 
         },
         async edit( $index ) {
-            console.log( "Edit "+$index )
             this.editRow = $index
         },
         async save( type, $index ){
@@ -471,7 +474,6 @@ let app = new Vue({
                     }                    
                 }
                 else if ( type == 'wpt_investments' ) {
-                    console.log(this.investments,$index)
                     this.investments = this.investments.filter( investment => investment.id != $index );
                 }
             }
@@ -533,11 +535,8 @@ let app = new Vue({
             let dataSend = new FormData();
             dataSend.append('action', 'wpt_save_data_with_wp');
             dataSend.append('id', this.temp.wpid );
-            console.log( this.temp.wpid );
             let { data } = await axios.post(ajaxurl, dataSend);
-            console.log( data );
             if( data ) {
-                console.log()
                 this.users.push( data );
             }
         },
@@ -545,12 +544,11 @@ let app = new Vue({
             let typeAction = this.actions.filter( action => {
                 if( ( action.foot <= this.currentActions ) && ( this.currentActions <= action.head ) ) return action;
             });
-            console.log( this.details, this.users[ this.details ] )
             this.users[ this.details ].actions.push({
                 precio: parseFloat( typeAction[0].precio ),
                 cantidad: parseInt( this.currentActions )
             });
-            
+            //this.save('wpt_users', this.users[this.details].id );
         }
         
     },
