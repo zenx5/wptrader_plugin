@@ -160,6 +160,9 @@ let app = new Vue({
         forKey: (elements, key, id) => {
             return elements.filter( element => element[ key ] == id );
         },
+        notUsed: (elements, users) => {
+            return elements.filter( element => users.filter( user => element.ID==user.wpid).length==0)
+        },
         fechaCobro: (elements,tiempo) => {
             return elements.filter( (element, index) => {
                 let hoyms = (new Date()).getTime();
