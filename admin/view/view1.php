@@ -109,7 +109,7 @@
                 <v-row>
                     <v-col>
                         <v-select
-                            :items="$userswp"
+                            :items="$userswp | notUsed(users)"
                             item-text="data.display_name"
                             item-value="data.ID"
                             v-model="temp.wpid"

@@ -32,6 +32,7 @@ let app = new Vue({
                 monto: 0,
                 released: false
             },
+            currentActions: 0,
             newActions: {
                 id: -1,
                 precio: 0,
@@ -83,6 +84,7 @@ let app = new Vue({
                 monto: 0,
                 wpid: -1,
                 count: null,
+                actions: []
             },
             users: [],
             countries: [],
@@ -121,7 +123,6 @@ let app = new Vue({
         this.actions = $t.actions;
         this.investments = $t.investments;
         this.rates.unshift(this.newRate)
-        console.log( this.actions )
         this.actions.unshift(this.newActions)
         this.settings = $t.settings[0];
         await this.getData();
@@ -138,6 +139,18 @@ let app = new Vue({
 
     },
     filters: {
+        totalActions: (elements, option) => {
+            if(elements == undefined) return 0;
+            let value = 0;
+            elements.forEach( element => {
+                if(option == 'cantidad') {
+                    value += element.cantidad;
+                }else if(option=='valor'){
+                    value += element.cantidad*element.precio;
+                }
+            })
+            return value;
+        },
         date: value => {
             if( value ) {
                 let valueArray = value.split("-");
@@ -159,16 +172,7 @@ let app = new Vue({
             return elements.filter( element => element[ key ] == id );
         },
         notUsed: (elements, users) => {
-            return elements.filter( element => {
-                console.log(users)
-                for( let user of users ) {
-                    console.log(user)
-                    if ( element.ID == user.wpid )
-                        return false;
-                }
-                return true
-            });
-            
+            return elements.filter( element => users.filter( user => element.ID==user.wpid).length==0)
         },
         fechaCobro: (elements,tiempo) => {
             return elements.filter( (element, index) => {
@@ -180,6 +184,12 @@ let app = new Vue({
                 elements[ index ].cobro = parseInt( ( fechacobroms - hoyms )/1000/60/60/24 );
                 return true;
             })
+        }
+    },
+    computed: {
+        validateAction(){
+            const {totalActions} = this.$options.filters;
+            return ( this.actions.length == 1) || (totalActions( this.temp.actions, 'cantidad' ) == this.settings.actionMax);
         }
     },
     methods: {
@@ -213,7 +223,6 @@ let app = new Vue({
             let valid = true;
             switch( type ){
                 case 'wpt_users':
-
                     valid = valid && ( !!this.temp.nombre );
                     valid = valid && ( !!this.temp.apellido );
                     valid = valid && ( !!this.temp.cedula );
@@ -277,7 +286,6 @@ let app = new Vue({
                 this.details = index;
                 this.temp = this.users[index]
                 this.tab = 2;
-                this.getAjax("count_down", {id:index})
             }else{
                 this.details = -1;
                 this.tab = 0;
@@ -291,7 +299,8 @@ let app = new Vue({
                     postalcode: "",
                     telefono: "",
                     monto: 0,
-                    wpid: -1
+                    wpid: -1,
+                    actions: []
                 }; 
             }
         },
@@ -310,18 +319,6 @@ let app = new Vue({
                     }else{
                         this.users.push( data );
                     }
-                    this.temp = {
-                        id: -1,
-                        nombre: "",
-                        apellido: "",
-                        cedula: "",
-                        correo: "",
-                        pais: "",
-                        postalcode: "",
-                        telefono: "",
-                        monto: 0,
-                        wpid: -1
-                    };
                     break;
                 case 'wpt_rates': 
                     if( id != -1 ){
@@ -418,7 +415,6 @@ let app = new Vue({
 
         },
         async edit( $index ) {
-            console.log( "Edit "+$index )
             this.editRow = $index
         },
         async save( type, $index ){
@@ -434,13 +430,14 @@ let app = new Vue({
                 else if( type == 'wpt_settings' ) { dataSend.append('value', JSON.stringify( this.settings ) ); }
                 //else { dataSend.append('value', JSON.stringify( this.investments.filter( investment => investment.id == $index )[0] ) ); }
             }
+            console.log( dataSend)
+            
             const { data } = await axios.post(ajaxurl, dataSend);
+            console.log( data )
             if( data ) {
                 this.addContent( type, data, $index );
             }
             this.editRow = -1;
-            
-            
             this.render = ! this.render;
         },
         async del(type, $index) {
@@ -476,7 +473,6 @@ let app = new Vue({
                     }                    
                 }
                 else if ( type == 'wpt_investments' ) {
-                    console.log(this.investments,$index)
                     this.investments = this.investments.filter( investment => investment.id != $index );
                 }
             }
@@ -491,6 +487,7 @@ let app = new Vue({
                 telefono: "",
                 monto: 0,
                 wpid: -1,
+                actions: []
             };
             this.newRate = {
                 id: -1,
@@ -537,14 +534,26 @@ let app = new Vue({
             let dataSend = new FormData();
             dataSend.append('action', 'wpt_save_data_with_wp');
             dataSend.append('id', this.temp.wpid );
-            console.log( this.temp.wpid );
             let { data } = await axios.post(ajaxurl, dataSend);
-            console.log( data );
             if( data ) {
-                console.log()
                 this.users.push( data );
             }
+        },
+        setAction(){
+            const {totalActions} = this.$options.filters;
+            let total = parseInt( totalActions( this.temp.actions, 'cantidad' ) ) + parseInt( this.currentActions );
+            console.log(total)
+            let typeAction = this.actions.filter( action => {
+                if( ( action.foot <= total ) && ( total <= action.head ) ) return action;
+            });
+            this.users[ this.details ].actions.push({
+                precio: parseFloat( typeAction[0].precio ),
+                cantidad: parseInt( this.currentActions )
+            });
+
+            this.save('wpt_users', this.users[ this.details ].id );
         }
+        
     },
     vuetify: new Vuetify()
 });
