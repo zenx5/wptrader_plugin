@@ -443,7 +443,7 @@ class WP_Trader {
                         'telefono' => '',
                         'monto' => 0,
                         'wpid' => $id, 
-                        'actions' => 0
+                        'actions' => []
                     ];
                     update_option('wpt_users', json_encode( $users ) );
                     echo json_encode([
@@ -458,7 +458,7 @@ class WP_Trader {
                         'telefono' => '',
                         'monto' => 0,
                         'wpid' => $id,
-                        'actions' => 0
+                        'actions' => []
                     ]);
                 }
             }

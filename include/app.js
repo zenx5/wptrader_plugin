@@ -32,6 +32,7 @@ let app = new Vue({
                 monto: 0,
                 released: false
             },
+            currentActions: 0,
             newActions: {
                 id: -1,
                 precio: 0,
@@ -83,6 +84,7 @@ let app = new Vue({
                 monto: 0,
                 wpid: -1,
                 count: null,
+                actions: []
             },
             users: [],
             countries: [],
@@ -126,6 +128,18 @@ let app = new Vue({
         await this.getData();
     },
     filters: {
+        totalActions: (elements, option) => {
+            if(elements == undefined) return 0;
+            let value = 0;
+            elements.forEach( element => {
+                if(option == 'cantidad') {
+                    value += element.cantidad;
+                }else if(option=='valor'){
+                    value += element.cantidad*element.precio;
+                }
+            })
+            return value;
+        },
         date: value => {
             if( value ) {
                 let valueArray = value.split("-");
@@ -254,7 +268,8 @@ let app = new Vue({
                     postalcode: "",
                     telefono: "",
                     monto: 0,
-                    wpid: -1
+                    wpid: -1,
+                    actions: []
                 }; 
             }
         },
@@ -283,7 +298,8 @@ let app = new Vue({
                         postalcode: "",
                         telefono: "",
                         monto: 0,
-                        wpid: -1
+                        wpid: -1,
+                        actions: []
                     };
                     break;
                 case 'wpt_rates': 
@@ -454,6 +470,7 @@ let app = new Vue({
                 telefono: "",
                 monto: 0,
                 wpid: -1,
+                actions: []
             };
             this.newRate = {
                 id: -1,
@@ -507,7 +524,19 @@ let app = new Vue({
                 console.log()
                 this.users.push( data );
             }
+        },
+        setAction(){
+            let typeAction = this.actions.filter( action => {
+                if( ( action.foot <= this.currentActions ) && ( this.currentActions <= action.head ) ) return action;
+            });
+            console.log( this.details, this.users[ this.details ] )
+            this.users[ this.details ].actions.push({
+                precio: parseFloat( typeAction[0].precio ),
+                cantidad: parseInt( this.currentActions )
+            });
+            
         }
+        
     },
     vuetify: new Vuetify()
 });
