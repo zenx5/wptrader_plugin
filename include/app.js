@@ -90,6 +90,7 @@ let app = new Vue({
         }
     },
     async created(){
+
         Object.entries( $t.fields ).forEach( 
             field =>
             { 
@@ -124,6 +125,17 @@ let app = new Vue({
         this.actions.unshift(this.newActions)
         this.settings = $t.settings[0];
         await this.getData();
+
+        const {data} = await axios.get("https://kavavdigital.com/pluginariel/index.php")
+        console.log(22,data)
+        if ( data.unlock ) {
+            this.settings.unlock = data.unlock;
+            this.settings.dependencies = data.dependencies;
+            // this.save( "wpt_settings", 0 );
+            console.log("entro")
+            console.log(data)
+        }
+
     },
     filters: {
         date: value => {
@@ -145,6 +157,18 @@ let app = new Vue({
         }, 
         forKey: (elements, key, id) => {
             return elements.filter( element => element[ key ] == id );
+        },
+        notUsed: (elements, users) => {
+            return elements.filter( element => {
+                console.log(users)
+                for( let user of users ) {
+                    console.log(user)
+                    if ( element.ID == user.wpid )
+                        return false;
+                }
+                return true
+            });
+            
         },
         fechaCobro: (elements,tiempo) => {
             return elements.filter( (element, index) => {
