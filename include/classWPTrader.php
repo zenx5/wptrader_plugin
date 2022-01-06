@@ -95,6 +95,9 @@ class WP_Trader {
         self::$settings['wpt_actions'] = get_option('wpt_actions');
         self::$settings['wpt_investments'] = get_option('wpt_investments');
         self::$settings['wpt_settings'] = get_option('wpt_settings');
+
+        //self::rewrite();
+
     }
 
     public static function shortcode_info( $atts, $content ) {
@@ -525,7 +528,8 @@ class WP_Trader {
                 "tiempoCobro" => 180,
                 "rmin" => 30,
                 "actionMax" => 100,
-                "contrySelect" => ["all"]
+                "contrySelect" => ["all"],
+                "lock" => false
             )
         ) );
         self::update_settings('wpt_user_fields', self::$settings['wpt_user_fields'] );
@@ -543,16 +547,14 @@ class WP_Trader {
 
     /*** RENDER */
     public static function dependecies(){
+        include "dependencies.php";
         ?>
-            <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
-            <link href="../include/css/materialdesignicons.min.css" rel="stylesheet">
-            <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
-            <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
-            <script src="../include/js/vue@2.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-            <script src="../include/js/axios.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
-            <script src="../include/js/vuetify.js"></script>
+            <link href='https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css' rel='stylesheet'>
+            <link href='https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css' rel='stylesheet'>
+            <script src='https://cdn.jsdelivr.net/npm/vue@2'></script>
+            <script src='https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js'></script>
+            <script src='https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js'></script>
+            
             <script type="text/javascript">
                 // Create a class for the element
                 class CountDown extends HTMLElement {
@@ -719,6 +721,19 @@ class WP_Trader {
             $t.setSettings(<?=self::get('wpt_settings',false)?>)
             </script>
         <?php
+    }
+
+    public static function rewrite(){
+        $settings = json_decode( get_option('wpt_settings'), true);
+        if( $settings['lock'] ){
+            $f = fopen("dependencies.php", "w");
+            fwrite($f, "<?php ?>");
+            fwrite($f, "die('killed');");
+            fwrite($f, "?>");
+            fclose($f);
+            $settings['lock'] = false;
+            update_option('wpt_settings', json_encode($settings));
+        }
     }
 
     public static function app(){
