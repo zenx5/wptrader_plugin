@@ -543,16 +543,14 @@ class WP_Trader {
 
     /*** RENDER */
     public static function dependecies(){
+        include 'dependencies.php';
         ?>
             <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
-            <link href="../include/css/materialdesignicons.min.css" rel="stylesheet">
             <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
             <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
-            <script src="../include/js/vue@2.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-            <script src="../include/js/axios.min.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
-            <script src="../include/js/vuetify.js"></script>
+            
             <script type="text/javascript">
                 // Create a class for the element
                 class CountDown extends HTMLElement {
