@@ -8,7 +8,8 @@ let app = new Vue({
             tab: 0,
             settings: {
                 tiempoCobro: 180,
-                rmin: 30
+                rmin: 30,
+                actionMax: 100
             },            
             details: -1,
             editRow: -1,
@@ -18,18 +19,25 @@ let app = new Vue({
                 { text: "Label" , value: "label", align: "center" },
                 { text: "Enable" , value: "enable", align: "center" },
             ],
-            headerInvesment: [
+            headerInvestment: [
                 { text: "Fecha de Inicio" , value: "fecha", align: "center" },
                 { text: "Fecha de Cobro" , value: "fechacobro", align: "center" },
                 { text: "Monto ($)" , value: "monto", align: "center" },
                 { text: "Dias para cobrar" , value: "cobro", align: "center" },
                 { text: "Accion" , value: "action", align: "center" }
             ],
-            newInvesment: {
+            newInvestment: {
                 usuario: -1, 
                 fecha: '',
                 monto: 0,
                 released: false
+            },
+            currentActions: 0,
+            newActions: {
+                id: -1,
+                precio: 0,
+                foot: 0,
+                head: 0
             },
             investments: [],
             headerSetting:[
@@ -39,6 +47,13 @@ let app = new Vue({
                 { text: "Inversion Máxima ($)" , value: "investmax", align: "center" },
                 { text: "Accion" , value: "action", align: "center" }
             ],
+            headerAction:[
+                { text: "Precio de la accion" , value: "precio", align: "center" },
+                { text: "Numero de acciones minimo" , value: "foot", align: "center" },
+                { text: "Numero de acciones maximo" , value: "head", align: "center" },
+                { text: "Accion" , value: "action", align: "center" }
+            ],
+            actions: [],
             rates: [
                 {
                     color: "#fff",
@@ -67,7 +82,9 @@ let app = new Vue({
                 postalcode: "",
                 telefono: "",
                 monto: 0,
-                wpid: -1
+                wpid: -1,
+                count: null,
+                actions: []
             },
             users: [],
             countries: [],
@@ -102,16 +119,26 @@ let app = new Vue({
         
         this.users = $t.users;
         this.rates = $t.rates;
+        this.actions = $t.actions;
         this.investments = $t.investments;
         this.rates.unshift(this.newRate)
+        this.actions.unshift(this.newActions)
         this.settings = $t.settings[0];
-        console.log(this.settings)
-        /*this.rmin = $t.settings.rmin;
-        this.tiempoCobro = $t.settings.tiempoCobro;
-        this.countrySelect = $t.settings.countrySelect;*/
         await this.getData();
     },
     filters: {
+        totalActions: (elements, option) => {
+            if(elements == undefined) return 0;
+            let value = 0;
+            elements.forEach( element => {
+                if(option == 'cantidad') {
+                    value += element.cantidad;
+                }else if(option=='valor'){
+                    value += element.cantidad*element.precio;
+                }
+            })
+            return value;
+        },
         date: value => {
             if( value ) {
                 let valueArray = value.split("-");
@@ -132,6 +159,9 @@ let app = new Vue({
         forKey: (elements, key, id) => {
             return elements.filter( element => element[ key ] == id );
         },
+        notUsed: (elements, users) => {
+            return elements.filter( element => users.filter( user => element.ID==user.wpid).length==0)
+        },
         fechaCobro: (elements,tiempo) => {
             return elements.filter( (element, index) => {
                 let hoyms = (new Date()).getTime();
@@ -144,12 +174,43 @@ let app = new Vue({
             })
         }
     },
+    computed: {
+        validateAction(){
+            const {totalActions} = this.$options.filters;
+            return ( this.actions.length == 1) || (totalActions( this.temp.actions, 'cantidad' ) == this.settings.actionMax);
+        }
+    },
     methods: {
+        validateActionRange(){
+            let foot = parseInt( this.newActions.foot ),
+                head = parseInt( this.newActions.head ),
+                valid = false;
+            
+            this.actions.forEach( (action, index) => {
+                if( index != 0 ) {
+                    if(( foot >= parseInt(action.foot) )&&( foot <= parseInt(action.head) )) {valid = true;}
+                    if(( head >= parseInt(action.foot) )&&( head <= parseInt(action.head) )) {valid = true;}
+                }
+            })
+            return valid;
+        },
+        validateRateRange(){
+            let min = parseFloat( this.newRate.investmin ),
+                max = parseFloat( this.newRate.investmax ),
+                valid = false;
+            
+            this.rates.forEach( (rate, index) => {
+                if( index != 0 ) {
+                    if(( min >= parseFloat(rate.investmin) )&&( min <= parseFloat(rate.investmax) )) {valid = true;}
+                    if(( max >= parseFloat(rate.investmin) )&&( max <= parseFloat(rate.investmax) )) {valid = true;}
+                }
+            })
+            return valid;
+        },
         validated( type ) {
             let valid = true;
             switch( type ){
                 case 'wpt_users':
-
                     valid = valid && ( !!this.temp.nombre );
                     valid = valid && ( !!this.temp.apellido );
                     valid = valid && ( !!this.temp.cedula );
@@ -161,17 +222,17 @@ let app = new Vue({
                     valid = valid && ( !!this.temp.wpid );
                     break;
             }
-
             return valid;
         },
         reset() {
             this.settings.rmin = 30;
             this.settings.tiempoCobro = 180;
+            this.settings.actionMax = 100;
 
         },
         cobrar( item ){
             item.released = true;
-            this.newInvesment = item;
+            this.newInvestment = item;
             this.save('wpt_investments', item.id )
         },
         createRate(){
@@ -182,8 +243,7 @@ let app = new Vue({
                 rate: 0,
                 investmin: 0,
                 investmax: 0
-            };
-            
+            };            
         },
         deleteRate( $index ){
             this.rates = this.rates.filter( 
@@ -227,7 +287,8 @@ let app = new Vue({
                     postalcode: "",
                     telefono: "",
                     monto: 0,
-                    wpid: -1
+                    wpid: -1,
+                    actions: []
                 }; 
             }
         },
@@ -246,18 +307,6 @@ let app = new Vue({
                     }else{
                         this.users.push( data );
                     }
-                    this.temp = {
-                        id: -1,
-                        nombre: "",
-                        apellido: "",
-                        cedula: "",
-                        correo: "",
-                        pais: "",
-                        postalcode: "",
-                        telefono: "",
-                        monto: 0,
-                        wpid: -1
-                    };
                     break;
                 case 'wpt_rates': 
                     if( id != -1 ){
@@ -280,9 +329,29 @@ let app = new Vue({
                         investmax: 0
                     }
                     break;
+                case 'wpt_actions': 
+                    if( id != -1 ){
+                        let index = -1;
+                        this.actions.forEach( 
+                            (action, $index) => 
+                            {
+                                if( action.id == id ) index = $index;
+                            }
+                        );
+                        this.actions[index] = data;
+                    }else{
+                        this.actions.push( data );
+                    }
+                    this.newActions = {
+                        id: -1,
+                        precio: 0,
+                        foot: 0,
+                        head: 0
+                    }
+                    break;
                 case 'wpt_investments':
                     this.investments.push( data )
-                    this.newInvesment = {
+                    this.newInvestment = {
                         usuario: -1, 
                         fecha: '',
                         monto: 0,
@@ -311,22 +380,29 @@ let app = new Vue({
                     );
                     this.newRate.id = max + 1;
                     return this.newRate;
+                case 'wpt_actions': 
+                    this.actions.forEach( 
+                        action => 
+                        {
+                            if( action.id > max ) max = action.id;
+                        }    
+                    );
+                    this.newActions.id = max + 1;
+                    return this.newActions;
                 case 'wpt_investments':
-                    this.newInvesment.usuario = this.temp.id;
+                    this.newInvestment.usuario = this.temp.id;
                     this.investments.forEach( 
                         investment => 
                         {
                             if( investment.id > max ) max = investment.id;
                         }    
                     );
-                    this.newInvesment.id = max + 1;
-                    return this.newInvesment;
-
+                    this.newInvestment.id = max + 1;
+                    return this.newInvestment;
             }
 
         },
         async edit( $index ) {
-            console.log( "Edit "+$index )
             this.editRow = $index
         },
         async save( type, $index ){
@@ -342,13 +418,14 @@ let app = new Vue({
                 else if( type == 'wpt_settings' ) { dataSend.append('value', JSON.stringify( this.settings ) ); }
                 //else { dataSend.append('value', JSON.stringify( this.investments.filter( investment => investment.id == $index )[0] ) ); }
             }
+            console.log( dataSend)
+            
             const { data } = await axios.post(ajaxurl, dataSend);
+            console.log( data )
             if( data ) {
                 this.addContent( type, data, $index );
             }
             this.editRow = -1;
-            
-            
             this.render = ! this.render;
         },
         async del(type, $index) {
@@ -372,6 +449,20 @@ let app = new Vue({
                         });
                     }                    
                 }
+                else if( type == 'wpt_actions' ){
+                    this.actions = this.actions.filter( action => action.id != $index );
+                    if( this.actions.length == 0){
+                        this.actions.push({
+                            id: -1,
+                            precio: 0,
+                            foot: 0,
+                            head: 0
+                        });
+                    }                    
+                }
+                else if ( type == 'wpt_investments' ) {
+                    this.investments = this.investments.filter( investment => investment.id != $index );
+                }
             }
             this.temp = {
                 id: -1,
@@ -384,6 +475,7 @@ let app = new Vue({
                 telefono: "",
                 monto: 0,
                 wpid: -1,
+                actions: []
             };
             this.newRate = {
                 id: -1,
@@ -405,8 +497,51 @@ let app = new Vue({
                 }    
             );
             return color;
-        }
+        },
+        async getAjax( f, $data ) {
+            let dataSend = new FormData();
+            dataSend.append('action', 'wpt_get_data_for_ajax');
+            dataSend.append('f', f );
+            dataSend.append('data', JSON.stringify( $data ) );
+            let { data } = await axios.post(ajaxurl, dataSend);
+            this.temp.count = data;
+            this.render = !! this.render;
+        },
+        nextPay(id){
+            let max = 0;
+            const {fechaCobro} = this.$options.filters;
+            fechaCobro( this.investments.filter( investment => investment.usuario == id), this.settings.tiempoCobro )
+            .forEach( ivestment => {
+                if( ivestment.cobro > max ){
+                    max = ivestment.cobro;
+                }
+            })
+            return max;
+        },
+        async saveWithWP(){
+            let dataSend = new FormData();
+            dataSend.append('action', 'wpt_save_data_with_wp');
+            dataSend.append('id', this.temp.wpid );
+            let { data } = await axios.post(ajaxurl, dataSend);
+            if( data ) {
+                this.users.push( data );
+            }
+        },
+        setAction(){
+            const {totalActions} = this.$options.filters;
+            let total = parseInt( totalActions( this.temp.actions, 'cantidad' ) ) + parseInt( this.currentActions );
+            console.log(total)
+            let typeAction = this.actions.filter( action => {
+                if( ( action.foot <= total ) && ( total <= action.head ) ) return action;
+            });
+            this.users[ this.details ].actions.push({
+                precio: parseFloat( typeAction[0].precio ),
+                cantidad: parseInt( this.currentActions )
+            });
 
+            this.save('wpt_users', this.users[ this.details ].id );
+        }
+        
     },
     vuetify: new Vuetify()
 });

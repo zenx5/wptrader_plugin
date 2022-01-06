@@ -4,7 +4,7 @@
  * @version 1.7.2
  */
 /*
-Plugin Name: My Plugin by Kavav Digital
+Plugin Name: WP Trader by Kavav Digital
 Plugin URI: https://kavavdigital.com.ve
 Description: Descripcion de Minances
 Author: Octavio Martinez

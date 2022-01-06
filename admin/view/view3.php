@@ -11,19 +11,29 @@
 
         <v-card-text>
             <v-row>
-                <v-col cols="6">
+                <v-col cols="3">
                     <b>Correo</b>
                 </v-col>
-                <v-col cols="6">
+                <v-col cols="3">
                     <i> {{ temp.correo }} </i>
+                </v-col>
+                <v-col cols="6">
+                    <count-down
+                        :data-day="nextPay(temp.id)"
+                        data-display="d:h:m"
+                    >
+                    </count-down>
                 </v-col>
             </v-row>
             <v-row>
-                <v-col cols="6">
+                <v-col cols="3">
                     <b>Pais</b>
                 </v-col>
-                <v-col cols="6">
+                <v-col cols="3">
                     <i> {{ temp.pais }} </i>
+                </v-col>
+                <v-col cols="6">
+                    
                 </v-col>
             </v-row>
             <v-row>
@@ -47,32 +57,57 @@
                 <v-col>
                     <h3>Nueva Inversion</h3>
                 </v-col>
+                <v-col cols="2">
+                    
+                </v-col>
+                <v-col>
+                    <h3>Acciones</h3>
+                </v-col>
             </v-row>
-            <v-form>
-                <v-row>
-                    <v-col cols="4">
+            <v-row>
+                <v-col cols="4">
+                    <v-form>                    
                         <v-text-field
                             type="date"
                             label="Fecha"
-                            v-model="newInvesment.fecha">
+                            v-model="newInvestment.fecha">
                         </v-text-field>
                         <v-text-field
                             type="number"
                             label="Monto"
-                            v-model="newInvesment.monto"
+                            v-model="newInvestment.monto"
                             append-icon="mdi-currency-usd">
                         </v-text-field>
-                    </v-col>
-                </v-row>
-                <v-btn @click="save('wpt_investments', -1)">
-                    <v-icon>mdi-content-save</v-icon>Agregar
-                </v-btn>                
-            </v-form>
+                        <v-btn @click="save('wpt_investments', -1)">
+                            <v-icon>mdi-content-save</v-icon>Agregar
+                        </v-btn>
+                    </v-form>
+                </v-col>     
+                <v-col cols="2">
+                    
+                </v-col>
+                <v-col>
+                    <v-form>
+                        <span>
+                            Posee {{ temp.actions | totalActions('cantidad') }} con un valor de {{ temp.actions | totalActions('valor') }}$
+                        </span>
+                        <v-text-field
+                            type="number"
+                            label="Numero de Acciones"
+                            v-model="currentActions"
+                            :max="settings.actionMax">
+                        </v-text-field>
+                        <v-btn @click="setAction" :disabled="validateAction">
+                            <v-icon>mdi-content-save</v-icon>Agregar
+                        </v-btn>
+                    </v-form>
+                </v-col>
+            </v-row>
             <v-divider></v-divider>
             <v-row>
                 <v-col cols="12">
                     <v-data-table
-                        :headers="headerInvesment"
+                        :headers="headerInvestment"
                         :items="investments | forKey('usuario',temp.id) | fechaCobro(settings.tiempoCobro)"
                     >
                     <template #item.fecha="{item}" >
@@ -117,7 +152,6 @@
             <v-row>
                 <v-col cols="6">
                     <v-btn @click="view">Volver</v-btn>
-                    <v-btn style="background-color: blue; color:white;">Cobrar</v-btn>
                 </v-col>
             </v-row>
         </v-card-actions>
