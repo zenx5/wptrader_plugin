@@ -515,7 +515,7 @@ class WP_Trader {
             'WP Trader Club',
             'WP Trader Club',
             'manage_options',
-            'wp-trader2/admin/view/all.php',
+            FOLDERNAME.'/admin/view/all.php',
             null,
             'https://api.iconify.design/ic/round-currency-exchange.svg?color=white',
             5
