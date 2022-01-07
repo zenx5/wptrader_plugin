@@ -8,7 +8,7 @@ Plugin Name: WP Trader by Kavav Digital
 Plugin URI: https://kavavdigital.com.ve
 Description: Descripcion de Minances
 Author: Octavio Martinez
-Version: 1.0.0
+Version: 2.0.0
 Author URI: https://wa.me/19104468990
 */
 

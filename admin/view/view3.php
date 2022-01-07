@@ -96,7 +96,8 @@
                             type="number"
                             label="Numero de Acciones"
                             v-model="currentActions"
-                            :max="settings.actionMax">
+                            min="0"
+                            :max="settings.actionMax - $options.filters.totalActions(temp.actions, 'cantidad')">
                         </v-text-field>
                         <v-btn @click="setAction" :disabled="validateAction">
                             <v-icon>mdi-content-save</v-icon>Agregar
@@ -141,16 +142,29 @@
                         </span>
                     </template>
                     <template #item.action="{item}">
-                        <v-icon 
-                            @click="cobrar"
-                            :disabled="item.cobro>0"
-                            v-if="!item.released">mdi-currency-usd</v-icon>
+                        <v-progress-circular
+                            :rotate="-90"
+                            :size="30"
+                            :width="4"
+                            :value="100-100*item.cobro/settings.tiempoCobro">
+                            <v-icon 
+                                @click="cobrar"
+                                :disabled="item.cobro>0"
+                                v-if="!item.released">mdi-currency-usd</v-icon>
+                        </v-progress-circular>
+                        <v-progress-circular
+                            :rotate="-90"
+                            :size="30"
+                            :width="4"
+                            :value="diasLeft(1,16)">
+                            <v-icon 
+                                @click=""
+                                v-if="!item.released">mdi-currency-usd</v-icon>    
+                        </v-progress-circular>                        
                         <v-icon 
                             @click="del('wpt_investments', item.id)"
                             v-if="!item.released">mdi-delete</v-icon>
-                        <v-icon 
-                            v-if="!item.released">mdi-content-save
-                        </v-icon>
+                        
                     </template>
                     </v-data-table>
                 </v-col>

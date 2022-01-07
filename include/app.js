@@ -196,6 +196,11 @@ let app = new Vue({
         }
     },
     methods: {
+        diasLeft(...dias){
+
+
+            return 2;
+        },
         porCobrar( diasTranscuridos, inversionInicial, saldoCobrado ){
             let porcentage = this.getRate( inversionInicial )/100;
             let saldoGenerado = inversionInicial * diasTranscuridos * porcentage;
