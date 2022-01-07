@@ -220,10 +220,15 @@ let app = new Vue({
                 max = parseFloat( this.newRate.investmax ),
                 valid = false;
             
+            if ( max == -1 ) max = Infinity;
+            if ( min >= max ) valid = true;
+
             this.rates.forEach( (rate, index) => {
                 if( index != 0 ) {
+                    let investMax = parseFloat(rate.investmax);
+                    if( investMax == -1 ) investMax = Infinity;
                     if(( min >= parseFloat(rate.investmin) )&&( min <= parseFloat(rate.investmax) )) {valid = true;}
-                    if(( max >= parseFloat(rate.investmin) )&&( max <= parseFloat(rate.investmax) )) {valid = true;}
+                    if(( max >= parseFloat(rate.investmin) )&&( max < parseFloat(rate.investmax) )) {valid = true;}
                 }
             })
             return valid;

@@ -50,13 +50,20 @@
                                     v-if="index==0"
                                     type="number"
                                     v-model="newRate.investmax"
-                                    min="0"
+                                    min="-1"
                                     append-icon="mdi-currency-usd"
                                 ></v-text-field>
-                                <span v-else>{{item.investmax}}<v-icon>mdi-currency-usd</v-icon></span>
+                                <span v-else>
+                                    <span v-if="item.investmax==-1">
+                                        <v-icon>mdi-infinity</v-icon><v-icon>mdi-currency-usd</v-icon>
+                                    </span>
+                                    <span v-else>
+                                        {{item.investmax}}<v-icon>mdi-currency-usd</v-icon>
+                                    </span>
+                                </span>
                             </template>
                             <template #item.action="{item, index}">
-                                <v-icon v-if="index==0" @click="save('wpt_rates',-1)" :validated="validateRateRange">mdi-content-save</v-icon>
+                                <v-icon v-if="index==0" @click="save('wpt_rates',-1)" :disabled="validateRateRange()">mdi-content-save</v-icon>
                                 <v-icon v-else @click="del('wpt_rates',item.id)">mdi-delete</v-icon>
                             </template>
                         </v-data-table>
