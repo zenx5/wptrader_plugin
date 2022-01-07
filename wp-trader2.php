@@ -12,7 +12,7 @@ Version: 1.0.0
 Author URI: https://wa.me/19104468990
 */
 
-define("FOLDERNAME", "wp-trader");
+define("FOLDERNAME", "wp-trader2");
 require 'include/classWPTrader.php';
 
 register_activation_hook( __FILE__, array('WP_Trader', 'active') );
