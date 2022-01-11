@@ -138,7 +138,7 @@
                     </template>
                     <template #item.generado="{item}">
                         <span>
-                            {{porCobrar( settings.tiempoCobro-item.cobro, item.monto, 0 )}}
+                            {{porCobrar( settings.tiempoCobro-item.cobro, item.monto, getUserById(item.usuario).cobrado[item.id] )}}
                         </span>
                     </template>
                     <template #item.action="{item}">
@@ -156,9 +156,10 @@
                             :rotate="-90"
                             :size="30"
                             :width="4"
-                            :value="diasLeft(1,16)">
+                            :value="0">
                             <v-icon 
                                 @click=""
+                                :disabled="habilitarCobro(porCobrar( settings.tiempoCobro-item.cobro, item.monto, getUserById(item.usuario).cobrado[item.id] ))"
                                 v-if="!item.released">mdi-currency-usd</v-icon>    
                         </v-progress-circular>                        
                         <v-icon 

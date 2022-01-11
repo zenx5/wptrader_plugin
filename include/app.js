@@ -85,7 +85,7 @@ let app = new Vue({
                 monto: 0,
                 wpid: -1,
                 count: null,
-                cobrado: 0,
+                cobrado: {},
                 actions: []
             },
             users: [],
@@ -196,12 +196,25 @@ let app = new Vue({
         }
     },
     methods: {
+        getUserById( id ) {
+            let user_temp = null;
+            this.users.forEach( user => {
+                if ( user.id == id ) {
+                    user_temp = user;
+                }
+            })
+            return user_temp;
+        },
+        habilitarCobro( saldoDisponible ) {
+            let date = new Date( ).getDate( );
+            return !(date !== 1 && date !== 16) || saldoDisponible < this.settings.rmin;
+        },
         diasLeft(...dias){
 
 
             return 2;
         },
-        porCobrar( diasTranscuridos, inversionInicial, saldoCobrado ){
+        porCobrar( diasTranscuridos, inversionInicial, saldoCobrado=0 ){
             let porcentage = this.getRate( inversionInicial )/100;
             let saldoGenerado = inversionInicial * diasTranscuridos * porcentage;
             let saldoDisponible = saldoGenerado - saldoCobrado;
@@ -319,7 +332,7 @@ let app = new Vue({
                     telefono: "",
                     monto: 0,
                     wpid: -1,
-                    cobrado: 0,
+                    cobrado: {},
                     actions: []
                 }; 
             }
@@ -507,7 +520,7 @@ let app = new Vue({
                 telefono: "",
                 monto: 0,
                 wpid: -1,
-                cobrado: 0,
+                cobrado: {},
                 actions: []
             };
             this.newRate = {
