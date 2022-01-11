@@ -90,7 +90,7 @@
                 <v-col>
                     <v-form>
                         <span>
-                            Posee {{ temp.actions | totalActions('cantidad') }} con un valor de {{ temp.actions | totalActions('valor') }}$
+                            Posee <b>{{ temp.actions | totalActions('cantidad') }}</b> con un valor de <b>{{ temp.actions | totalActions('valor') }}$</b>
                         </span>
                         <v-text-field
                             type="number"

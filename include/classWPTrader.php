@@ -184,9 +184,6 @@ class WP_Trader {
                 case "recibidos":
                     return self::get_total_released($id);
                     break;
-                case "acciones":
-                    return 10;
-                    break;
             }
 
         }
@@ -579,27 +576,55 @@ class WP_Trader {
                         box.setAttribute('class', 'cd-wrapper');
                         this.box = box;
 
-
-                        const day = document.createElement('span');
-                        day.setAttribute('class', 'cd-box');
+                        const cday = document.createElement('span')
+                        cday.setAttribute('class', 'cd-c-box');
+                            const day = document.createElement('span');
+                            day.setAttribute('class', 'cd-box');
+                            cday.append(day);
+                            const lday = document.createElement('label');
+                            lday.setAttribute('class', 'cd-label');
+                            lday.textContent = "Dias";
+                            cday.append(lday);
+                        
                         this.day = 0;
                         day.textContent = this.day;
                         this.elements.day = day;
 
-                        const hour = document.createElement('span');
-                        hour.setAttribute('class', 'cd-box');
+                        const chour = document.createElement('span');
+                        chour.setAttribute('class', 'cd-c-box');
+                            const hour = document.createElement('span');
+                            hour.setAttribute('class', 'cd-box');
+                            chour.append(hour);
+                            const lhour = document.createElement('label');
+                            lhour.setAttribute('class', 'cd-label');
+                            lhour.textContent = "Horas"
+                            chour.append(lhour);
                         this.hour = 0;
                         hour.textContent = this.hour;
                         this.elements.hour = hour;
 
-                        const minute = document.createElement('span');
-                        minute.setAttribute('class', 'cd-box');
+                        const cminute = document.createElement('span');
+                        cminute.setAttribute('class', 'cd-c-box');
+                            const minute = document.createElement('span');
+                            minute.setAttribute('class', 'cd-box');
+                            cminute.append(minute);
+                            const lminute = document.createElement('label');
+                            lminute.setAttribute('class', 'cd-label');
+                            lminute.textContent = "Minutos"
+                            cminute.append(lminute);
                         this.minute = 0;
                         minute.textContent = this.minute;
                         this.elements.minute = minute;
 
-                        const second = document.createElement('span');
-                        second.setAttribute('class', 'cd-box');
+                        const csecond = document.createElement('span');
+                        csecond.setAttribute('class', 'cd-c-box');
+                            const second = document.createElement('span');
+                            second.setAttribute('class', 'cd-box');
+                            csecond.append(second);
+                            const lsecond = document.createElement('label');
+                            lsecond.setAttribute('class', 'cd-label');
+                            lsecond.textContent = "Segundos"
+                            csecond.append(lsecond);
                         this.second = 0;
                         second.textContent = this.second;
                         this.elements.second = second;
@@ -620,15 +645,21 @@ class WP_Trader {
                             justify-content: space-around;
                         }
 
-                        .cd-box {
+                        .cd-c-box {
+                            display:flex;
+                            flex-direction: column;
+                            justify-content:flex-end;
                             width: 90px;
-                            font-size: 50px;
+                            height:70px;
                             text-align: center;
                             box-shadow: 0px 0px 10px rgb(0 0 0 / 30%);
-                            border-radius: 10px;                        
+                            border-radius: 10px;
                         }
-                        .cd-box::after {
-                            
+                        .cd-box {
+                            font-size: 50px;
+                        }
+                        .cd-label {
+                            margin-top:10px;
                         }
                         `;
 
@@ -639,10 +670,10 @@ class WP_Trader {
                         shadow.appendChild(style);
                         
                         shadow.appendChild(box);
-                        box.appendChild(day);
-                        box.appendChild(hour);
-                        box.appendChild(minute);
-                        box.appendChild(second);
+                        box.appendChild(cday);
+                        box.appendChild(chour);
+                        box.appendChild(cminute);
+                        box.appendChild(csecond);
                         
                         this.idInterval = setInterval( _ => {
                             this.load();
@@ -670,13 +701,13 @@ class WP_Trader {
                     }
 
                     render() {
-                        this.elements.day.style.display = this.display.indexOf('d')==-1?'none':'inline-block';
+                        this.elements.day.parentElement.style.display = this.display.indexOf('d')==-1?'none':'flex';
                         this.elements.day.textContent = this.day;
-                        this.elements.hour.style.display = this.display.indexOf('h')==-1?'none':'inline-block';
+                        this.elements.hour.parentElement.style.display = this.display.indexOf('h')==-1?'none':'flex';
                         this.elements.hour.textContent = this.hour;
-                        this.elements.minute.style.display = this.display.indexOf('m')==-1?'none':'inline-block';
+                        this.elements.minute.parentElement.style.display = this.display.indexOf('m')==-1?'none':'flex';
                         this.elements.minute.textContent = this.minute;
-                        this.elements.second.style.display = this.display.indexOf('s')==-1?'none':'inline-block';
+                        this.elements.second.parentElement.style.display = this.display.indexOf('s')==-1?'none':'flex';
                         this.elements.second.textContent = this.second;
                     }
 
