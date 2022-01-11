@@ -449,6 +449,7 @@ class WP_Trader {
                         'telefono' => '',
                         'monto' => 0,
                         'wpid' => $id, 
+                        'cobrado' => array(),
                         'actions' => []
                     ];
                     update_option('wpt_users', json_encode( $users ) );
@@ -464,7 +465,7 @@ class WP_Trader {
                         'telefono' => '',
                         'monto' => 0,
                         'wpid' => $id,
-                        'cobrado' => 0,
+                        'cobrado' => array(),
                         'actions' => []
                     ]);
                 }
