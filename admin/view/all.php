@@ -28,6 +28,9 @@
     #wp-trader-app input[type="number"]{
         text-align: right;
     }
+    #wp-trader-app button.v-icon.notranslate.v-icon--link.mdi.mdi-currency-usd:not([disabled])::before {
+        color: green;
+    }
 </style>
 <div class="trader-app-container">
     

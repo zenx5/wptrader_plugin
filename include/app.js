@@ -205,7 +205,7 @@ let app = new Vue({
             })
             return user_temp;
         },
-        abilitarCobro( saldoDisponible ) {
+        habilitarCobro( saldoDisponible ) {
             let date = new Date( ).getDate( );
             return !(date !== 1 && date !== 16) || saldoDisponible < this.settings.rmin;
         },

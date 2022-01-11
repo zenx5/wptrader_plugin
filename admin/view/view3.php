@@ -156,10 +156,10 @@
                             :rotate="-90"
                             :size="30"
                             :width="4"
-                            :value="diasLeft(1,16)">
+                            :value="0">
                             <v-icon 
                                 @click=""
-                                :disabled="abilitarCobro(porCobrar( settings.tiempoCobro-item.cobro, item.monto, getUserById(item.usuario).cobrado[item.id] ))"
+                                :disabled="habilitarCobro(porCobrar( settings.tiempoCobro-item.cobro, item.monto, getUserById(item.usuario).cobrado[item.id] ))"
                                 v-if="!item.released">mdi-currency-usd</v-icon>    
                         </v-progress-circular>                        
                         <v-icon 
