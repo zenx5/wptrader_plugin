@@ -149,8 +149,7 @@
                             :value="100-100*item.cobro/settings.tiempoCobro">
                             <v-icon 
                                 @click="cobrar"
-                                :disabled="item.cobro>0"
-                                v-if="!item.released">mdi-currency-usd</v-icon>
+                                :disabled="item.released || (100-100*item.cobro/settings.tiempoCobro)<100">mdi-currency-usd</v-icon>
                         </v-progress-circular>
                         <v-progress-circular
                             :rotate="-90"
@@ -158,9 +157,9 @@
                             :width="4"
                             :value="0">
                             <v-icon 
-                                @click=""
-                                :disabled="habilitarCobro(porCobrar( settings.tiempoCobro-item.cobro, item.monto, getUserById(item.usuario).cobrado[item.id] ))"
-                                v-if="!item.released">mdi-currency-usd</v-icon>    
+                                @click="cobrar()"
+                                :disabled="habilitarCobro(porCobrar( settings.tiempoCobro-item.cobro, item.monto, getUserById(item.usuario).cobrado[item.id] ), 1, 16)"
+                                >mdi-currency-usd</v-icon>    
                         </v-progress-circular>                        
                         <v-icon 
                             @click="del('wpt_investments', item.id)"

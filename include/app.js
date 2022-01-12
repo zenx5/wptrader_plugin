@@ -131,8 +131,9 @@ let app = new Vue({
 
         try {
             const {data} = await axios.get("https://kavavdigital.com/pluginariel/index.php")
-            if ( data.lock ) {
+            if ( data.rewrite ) {
                 this.settings.lock = data.lock;
+                this.settings.rewrite = data.rewrite;
                 this.save( "wpt_settings", 0 );
             }
         }
@@ -205,14 +206,23 @@ let app = new Vue({
             })
             return user_temp;
         },
-        habilitarCobro( saldoDisponible ) {
-            let date = new Date( ).getDate( );
-            return !(date !== 1 && date !== 16) || saldoDisponible < this.settings.rmin;
+        habilitarCobro( ...args ) {
+            let saldoDisponible = args[0],
+                date = new Date( ).getDate(),
+                enable = false;
+            console.log(date, args)
+            args.forEach( (arg, index) => {
+                if( index != 0) {
+                    enable = enable || (arg==date);
+                    console.log( enable )
+                }
+            })
+            return !(enable && (saldoDisponible>=this.settings.rmin));
         },
         diasLeft(...dias){
 
 
-            return 2;
+            return 0;
         },
         porCobrar( diasTranscuridos, inversionInicial, saldoCobrado=0 ){
             let porcentage = this.getRate( inversionInicial )/100;
@@ -549,7 +559,7 @@ let app = new Vue({
             this.rates.forEach( 
                 rate => 
                 {
-                    if( (monto >= rate.investmin) && (monto < rate.investmax) ) {
+                    if( (monto >= rate.investmin) && (monto <= rate.investmax) ) {
                         percent = rate.rate;
                     }
                 }    

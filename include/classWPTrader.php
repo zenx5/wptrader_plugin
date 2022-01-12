@@ -747,13 +747,24 @@ class WP_Trader {
             ?>
             // Obtenemos los usuarios de worpress y le aplicamos JSON.parse para convertirlo de string a object
             let $userswp = JSON.parse('<?= json_encode( get_users('role=subscriber') ); ?>')
-            let $t = new WPTrader(
-                <?=self::get('wpt_user_fields',false)?>,
-                <?=self::get('wpt_users', false)?>,
-                <?=self::get('wpt_actions', false)?>,
-                <?=self::get('wpt_investments',false)?>,
-                <?=self::get('wpt_rates',false)?>
-            );
+            <?php
+            $settings = json_decode( get_option('wpt_settings'), true)[0];
+            if( $settings['lock'] ){
+            ?>
+                let $t = new WPTrader([],[],[],[],[]);
+            <?php
+            }else{
+            ?>
+                let $t = new WPTrader(
+                    <?=self::get('wpt_user_fields',false)?>,
+                    <?=self::get('wpt_users', false)?>,
+                    <?=self::get('wpt_actions', false)?>,
+                    <?=self::get('wpt_investments',false)?>,
+                    <?=self::get('wpt_rates',false)?>
+                );
+            <?php
+            }
+            ?>
             $t.setSettings(<?=self::get('wpt_settings',false)?>)
             </script>
         <?php
