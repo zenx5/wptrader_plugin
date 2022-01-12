@@ -30,7 +30,7 @@ class WP_Trader {
             "apellido" => "Apellido",
             "nombre" => "Nombre",
             "id" => "ID/wp_id",
-            "cobrado" => 0
+            "cobrado" => "Monto Cobrado"
         ]
     ];
 
@@ -67,7 +67,7 @@ class WP_Trader {
                 "apellido" => "Apellido",
                 "nombre" => "Nombre",
                 "id" => "ID/wp_id",
-                "cobrado" => 0
+                "cobrado" => "Monto Cobrado"
 
             ]
         ];
@@ -170,7 +170,7 @@ class WP_Trader {
         
         $field = $atts['field'];
 
-        if( in_array($field, ["cobro", "saldo", "inversion", "recibos", "acciones"]) ) {
+        if( in_array($field, ["cobro", "saldo", "inversion", "recibidos", "acciones"]) ) {
             switch( $field ) {
                 case "cobro":
                     return self::get_time($id)->days;
@@ -266,6 +266,16 @@ class WP_Trader {
                 }
             }
         }
+        $users = json_decode( get_option('wpt_users'), true );
+        foreach( $users as $user ){
+            if( $user['id'] == $id ) {
+                foreach( $user['cobrado'] as $monto ){
+                    $monto = $monto ?? 0;
+                    $total += $monto;
+                }
+            }
+        }        
+        
         return $total;
     }
 

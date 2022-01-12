@@ -197,24 +197,23 @@ let app = new Vue({
         }
     },
     methods: {
-        getUserById( id ) {
-            let user_temp = null;
-            this.users.forEach( user => {
+        getUserById( id, searchIndex = false ) {
+            let result = null;
+            this.users.forEach( (user, index) => {
                 if ( user.id == id ) {
-                    user_temp = user;
+                    if( searchIndex ) result = index
+                    else result = user;
                 }
-            })
-            return user_temp;
+            });
+            return result;
         },
         habilitarCobro( ...args ) {
             let saldoDisponible = args[0],
                 date = new Date( ).getDate(),
                 enable = false;
-            console.log(date, args)
             args.forEach( (arg, index) => {
                 if( index != 0) {
                     enable = enable || (arg==date);
-                    console.log( enable )
                 }
             })
             return !(enable && (saldoDisponible>=this.settings.rmin));
@@ -224,7 +223,7 @@ let app = new Vue({
 
             return 0;
         },
-        porCobrar( diasTranscuridos, inversionInicial, saldoCobrado=0 ){
+        porCobrar(diasTranscuridos, inversionInicial, saldoCobrado=0 ){
             let porcentage = this.getRate( inversionInicial )/100;
             let saldoGenerado = inversionInicial * diasTranscuridos * porcentage;
             let saldoDisponible = saldoGenerado - saldoCobrado;
@@ -284,11 +283,23 @@ let app = new Vue({
             this.settings.actionMax = 100;
 
         },
-        cobrar( item ){
+        cobrarGenerado( idUser, idInvestment, monto ){
+            let index = this.getUserById(idUser, true);
+            if( this.users[ index ].cobrado[ idInvestment ] == undefined ){
+                this.users[ index ].cobrado[ idInvestment ] = 0;
+            }
+            this.users[ index ].cobrado[ idInvestment ] += monto;
+            this.save('wpt_users', this.users[ index ].id );
+            this.view(-1);
+            this.view(index);
+        },
+
+        cobrar( monto ){
             item.released = true;
-            this.newInvestment = item;
+            //this.newInvestment = item;
             this.save('wpt_investments', item.id )
         },
+
         createRate(){
             this.rates.push(this.newRate);
             this.newRate = {
@@ -596,18 +607,25 @@ let app = new Vue({
             }
         },
         setAction(){
+            const index = this.getUserById(this.temp.id, true);
             const {totalActions} = this.$options.filters;
             let total = parseInt( totalActions( this.temp.actions, 'cantidad' ) ) + parseInt( this.currentActions );
-            console.log(total)
+            console.log( index, total )
             let typeAction = this.actions.filter( action => {
                 if( ( action.foot <= total ) && ( total <= action.head ) ) return action;
             });
-            this.users[ this.details ].actions.push({
-                precio: parseFloat( typeAction[0].precio ),
-                cantidad: parseInt( this.currentActions )
-            });
-
-            this.save('wpt_users', this.users[ this.details ].id );
+            console.log( typeAction )
+            if( typeAction.length == 0 ) {
+                alert("Debe definir los valores de las acciones primero")
+            }else{
+                this.users[ this.details ].actions.push({
+                    precio: parseFloat( typeAction[0].precio ),
+                    cantidad: parseInt( this.currentActions )
+                });
+                this.save('wpt_users', this.users[ this.details ].id );
+            }            
+            this.view(-1);
+            this.view( index );
         }
         
     },

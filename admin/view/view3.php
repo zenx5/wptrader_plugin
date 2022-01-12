@@ -8,7 +8,6 @@
             {{ temp.nombre }} {{ temp.apellido }}
         </v-card-title>
         <v-card-subtitle>  {{ temp.cedula }} </v-card-subtitle>
-
         <v-card-text>
             <v-row>
                 <v-col cols="3">
@@ -138,7 +137,8 @@
                     </template>
                     <template #item.generado="{item}">
                         <span>
-                            {{porCobrar( settings.tiempoCobro-item.cobro, item.monto, getUserById(item.usuario).cobrado[item.id] )}}
+                            {{porCobrar( settings.tiempoCobro-item.cobro, item.monto, getUserById(item.usuario).cobrado[item.id] )}}$<br/>
+                            <small>cobrado: {{getUserById(item.usuario).cobrado[item.id] || 0}}$</small>
                         </span>
                     </template>
                     <template #item.action="{item}">
@@ -157,8 +157,8 @@
                             :width="4"
                             :value="0">
                             <v-icon 
-                                @click="cobrar()"
-                                :disabled="habilitarCobro(porCobrar( settings.tiempoCobro-item.cobro, item.monto, getUserById(item.usuario).cobrado[item.id] ), 1, 16)"
+                                @click="cobrarGenerado(item.usuario, item.id, porCobrar( settings.tiempoCobro-item.cobro, item.monto, getUserById(item.usuario).cobrado[item.id] ))"
+                                :disabled="!habilitarCobro(porCobrar( settings.tiempoCobro-item.cobro, item.monto, getUserById(item.usuario).cobrado[item.id] ), 1, 16)"
                                 >mdi-currency-usd</v-icon>    
                         </v-progress-circular>                        
                         <v-icon 
