@@ -259,7 +259,9 @@ class WP_Trader {
     public static function get_total_released($id){
         $investments = json_decode( get_option('wpt_investments'), true );
         $total = 0;
+        $idsInvestment = [];
         foreach( $investments as $investment ) {
+            $idsInvestment[] = $investment['id'];
             if( $investment['usuario'] == $id ) {
                 if( !! $investment['released']  ) {
                     $total += (float) $investment['monto'];
@@ -269,9 +271,11 @@ class WP_Trader {
         $users = json_decode( get_option('wpt_users'), true );
         foreach( $users as $user ){
             if( $user['id'] == $id ) {
-                foreach( $user['cobrado'] as $monto ){
-                    $monto = $monto ?? 0;
-                    $total += $monto;
+                foreach( $user['cobrado'] as $idI => $monto ){
+                    if( in_array($idI,  $investment ) ){
+                        $monto = $monto ?? 0;
+                        $total += $monto;
+                    }
                 }
             }
         }        

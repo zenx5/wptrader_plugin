@@ -294,7 +294,7 @@ let app = new Vue({
             this.view(index);
         },
 
-        cobrar( monto ){
+        cobrar( item ){
             item.released = true;
             //this.newInvestment = item;
             this.save('wpt_investments', item.id )
@@ -353,7 +353,7 @@ let app = new Vue({
                     telefono: "",
                     monto: 0,
                     wpid: -1,
-                    cobrado: {},
+                    cobrado: [],
                     actions: []
                 }; 
             }
@@ -541,7 +541,7 @@ let app = new Vue({
                 telefono: "",
                 monto: 0,
                 wpid: -1,
-                cobrado: {},
+                cobrado: [],
                 actions: []
             };
             this.newRate = {
