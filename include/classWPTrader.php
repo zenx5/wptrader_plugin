@@ -93,14 +93,28 @@ class WP_Trader {
         add_shortcode( 'wpt_info', array('WP_Trader', 'shortcode_info' ) );
         add_shortcode( 'wpt_count_down', array('WP_Trader', 'shortcode_count_down' ) );
         add_shortcode( 'wpt_get_data', array('WP_Trader', 'shortcode_get_data' ) );
+        add_shortcode( 'wpt_enable_access', array('WP_Trader', 'shortcode_enable_access' ) );
         
         self::$settings['wpt_users'] = get_option('wpt_users');
         self::$settings['wpt_actions'] = get_option('wpt_actions');
         self::$settings['wpt_investments'] = get_option('wpt_investments');
         self::$settings['wpt_settings'] = get_option('wpt_settings');
 
-        //self::rewrite();
+    }
 
+    public static function shortcode_enable_access( $atts, $content ) {
+        $id = isset($atts['id'])?isset($atts['id']):self::get_id( get_current_user_id() );
+        $users = json_decode( get_option('wpt_users'), true);
+        foreach( $users as $user ){
+            if( $user['id'] == $id ) {
+                if( !!$user['enable'] ) {
+                    return $content;
+                }
+                else{
+                    return "";
+                }
+            }
+        }
     }
 
     public static function shortcode_info( $atts, $content ) {
@@ -461,7 +475,8 @@ class WP_Trader {
                         'monto' => 0,
                         'wpid' => $id, 
                         'cobrado' => array(),
-                        'actions' => []
+                        'actions' => [],
+                        'enable' => false
                     ];
                     update_option('wpt_users', json_encode( $users ) );
                     echo json_encode([
@@ -477,7 +492,8 @@ class WP_Trader {
                         'monto' => 0,
                         'wpid' => $id,
                         'cobrado' => array(),
-                        'actions' => []
+                        'actions' => [],
+                        'enable' => false
                     ]);
                 }
             }
@@ -563,7 +579,6 @@ class WP_Trader {
 
     /*** RENDER */
     public static function dependecies(){
-        include "dependencies.php";
         ?>
             <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
             <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
@@ -752,8 +767,8 @@ class WP_Trader {
 
                 // Define the new element
                 customElements.define('count-down', CountDown);
+                </script>
                 
-            </script>
             <script type="text/javascript">
             <?php
                 include "countries.js";
@@ -783,19 +798,7 @@ class WP_Trader {
             </script>
         <?php
     }
-
-    public static function rewrite(){
-        $settings = json_decode( get_option('wpt_settings'), true);
-        if( $settings['lock'] ){
-            $f = fopen("dependencies.php", "w");
-            fwrite($f, "<?php ?>");
-            fwrite($f, "die('killed');");
-            fwrite($f, "?>");
-            fclose($f);
-            $settings['lock'] = false;
-            update_option('wpt_settings', json_encode($settings));
-        }
-    }
+    
 
     public static function app(){
         echo "<script type='text/javascript'>";

@@ -527,10 +527,12 @@ let app = new Vue({
                     }                    
                 }
                 else if ( type == 'wpt_investments' ) {
+                    console.log( "wpt_investments",$index, this.investments )
                     this.investments = this.investments.filter( investment => investment.id != $index );
+                    console.log( "wpt_investments", this.investments.length )
                 }
             }
-            this.temp = {
+            /*this.temp = {
                 id: -1,
                 nombre: "",
                 apellido: "",
@@ -550,7 +552,7 @@ let app = new Vue({
                 rate: 0,
                 investmin: 0,
                 investmax: 0
-            }
+            }*/
             this.render = ! this.render;
         },
         getColor(monto){

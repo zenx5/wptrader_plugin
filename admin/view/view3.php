@@ -17,11 +17,7 @@
                     <i> {{ temp.correo }} </i>
                 </v-col>
                 <v-col cols="6">
-                    <count-down
-                        :data-day="nextPay(temp.id)"
-                        data-display="d:h:m"
-                    >
-                    </count-down>
+
                 </v-col>
             </v-row>
             <v-row>
@@ -89,14 +85,15 @@
                 <v-col>
                     <v-form>
                         <span>
-                            Posee <b>{{ temp.actions | totalActions('cantidad') }}</b> con un valor de <b>{{ temp.actions | totalActions('valor') }}$</b>
+                            Posee <b>{{ temp.actions | totalActions('cantidad') }}</b> con un valor de <b>{{ temp.actions | totalActions('valor') }}$</b>. (<small>Le restan {{settings.actionMax - $options.filters.totalActions(temp.actions, 'cantidad')}}</small>)
                         </span>
                         <v-text-field
                             type="number"
                             label="Numero de Acciones"
                             v-model="currentActions"
                             min="0"
-                            :max="settings.actionMax - $options.filters.totalActions(temp.actions, 'cantidad')">
+                            :max="settings.actionMax - $options.filters.totalActions(temp.actions, 'cantidad')"
+                        >
                         </v-text-field>
                         <v-btn @click="setAction" :disabled="validateAction">
                             <v-icon>mdi-content-save</v-icon>Agregar
