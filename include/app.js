@@ -502,6 +502,12 @@ let app = new Vue({
             if( data ) {
                 if( type == 'wpt_users' ) {
                     this.users = this.users.filter( user => user.id != $index );
+                    this.investments
+                        .filter( investment => investment.usuario == $index )
+                        .forEach( investment => { 
+                            this.del('wpt_investments', investment.id );
+                        })
+                    
                 }else if( type == 'wpt_rates' ){
                     this.rates = this.rates.filter( rate => rate.id != $index );
                     if( this.rates.length == 0){
@@ -529,8 +535,8 @@ let app = new Vue({
                     this.investments = this.investments.filter( investment => investment.id != $index );
                 }
             }
-            this.render = ! this.render;
-            this.getData()
+            //this.render = ! this.render;
+            //this.getData()
         },
         getColor(monto){
             let color = "#fff";
