@@ -1,5 +1,6 @@
 class WPTrader {
     constructor(fields, users, actions, investments, rates){
+        console.log( users )
         this.fields = fields;
         this.users = users;
         this.actions = actions;
@@ -47,7 +48,7 @@ class WPTrader {
         investments.forEach( 
             investment => 
             {
-                total += investment.monto
+                total += parseFloat( investment.monto )
             }
         )
         return total;

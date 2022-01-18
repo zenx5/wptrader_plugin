@@ -484,15 +484,14 @@ let app = new Vue({
                 else if( type == 'wpt_settings' ) { dataSend.append('value', JSON.stringify( this.settings ) ); }
                 //else { dataSend.append('value', JSON.stringify( this.investments.filter( investment => investment.id == $index )[0] ) ); }
             }
-            console.log( dataSend)
             
             const { data } = await axios.post(ajaxurl, dataSend);
-            console.log( data )
             if( data ) {
                 this.addContent( type, data, $index );
             }
             this.editRow = -1;
             this.render = ! this.render;
+            this.getData()
         },
         async del(type, $index) {
             let dataSend = new FormData();
@@ -527,33 +526,11 @@ let app = new Vue({
                     }                    
                 }
                 else if ( type == 'wpt_investments' ) {
-                    console.log( "wpt_investments",$index, this.investments )
                     this.investments = this.investments.filter( investment => investment.id != $index );
-                    console.log( "wpt_investments", this.investments.length )
                 }
             }
-            /*this.temp = {
-                id: -1,
-                nombre: "",
-                apellido: "",
-                cedula: "",
-                correo: "",
-                pais: "",
-                postalcode: "",
-                telefono: "",
-                monto: 0,
-                wpid: -1,
-                cobrado: [],
-                actions: []
-            };
-            this.newRate = {
-                id: -1,
-                color: "#fff",
-                rate: 0,
-                investmin: 0,
-                investmax: 0
-            }*/
             this.render = ! this.render;
+            this.getData()
         },
         getColor(monto){
             let color = "#fff";
@@ -612,20 +589,23 @@ let app = new Vue({
             const index = this.getUserById(this.temp.id, true);
             const {totalActions} = this.$options.filters;
             let total = parseInt( totalActions( this.temp.actions, 'cantidad' ) ) + parseInt( this.currentActions );
-            console.log( index, total )
             let typeAction = this.actions.filter( action => {
                 if( ( action.foot <= total ) && ( total <= action.head ) ) return action;
             });
-            console.log( typeAction )
-            if( typeAction.length == 0 ) {
-                alert("Debe definir los valores de las acciones primero")
-            }else{
+            if( total > this.settings.actionMax ) {
+                alert("El valor ingresado supera la cantidad de Acciones disponibles para este usuario");
+            }
+            else if( typeAction.length == 0 ) {
+                alert("Debe definir los valores de las acciones primero");
+            }
+            else{
                 this.users[ this.details ].actions.push({
                     precio: parseFloat( typeAction[0].precio ),
                     cantidad: parseInt( this.currentActions )
                 });
                 this.save('wpt_users', this.users[ this.details ].id );
-            }            
+            }
+            this.currentActions = 0;
             this.view(-1);
             this.view( index );
         }

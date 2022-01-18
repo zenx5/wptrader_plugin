@@ -30,7 +30,6 @@ class WP_Trader {
             "apellido" => "Apellido",
             "nombre" => "Nombre",
             "id" => "ID/wp_id",
-            "cobrado" => "Monto Cobrado"
         ]
     ];
 
@@ -67,8 +66,6 @@ class WP_Trader {
                 "apellido" => "Apellido",
                 "nombre" => "Nombre",
                 "id" => "ID/wp_id",
-                "cobrado" => "Monto Cobrado"
-
             ]
         ];
         foreach( $defaultSettings as $key => $value ) {
@@ -511,7 +508,6 @@ class WP_Trader {
         if( $id == -1 ) {
             $content[] = $value;
         }else{
-            $aux = [];
             foreach( $content as $index => $element ) {
                 if( $element['id'] == $id ) {
                     $content[ $index ] = $value;

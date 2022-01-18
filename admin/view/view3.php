@@ -155,7 +155,7 @@
                             :value="0">
                             <v-icon 
                                 @click="cobrarGenerado(item.usuario, item.id, porCobrar( settings.tiempoCobro-item.cobro, item.monto, getUserById(item.usuario).cobrado[item.id] ))"
-                                :disabled="!habilitarCobro(porCobrar( settings.tiempoCobro-item.cobro, item.monto, getUserById(item.usuario).cobrado[item.id] ), 1, 16)"
+                                :disabled="habilitarCobro(porCobrar( settings.tiempoCobro-item.cobro, item.monto, getUserById(item.usuario).cobrado[item.id] ), 1, 16)"
                                 >mdi-currency-usd</v-icon>    
                         </v-progress-circular>                        
                         <v-icon 
