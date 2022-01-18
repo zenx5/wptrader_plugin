@@ -609,7 +609,6 @@ let app = new Vue({
             this.view(-1);
             this.view( index );
         }
-        
     },
     vuetify: new Vuetify()
 });
