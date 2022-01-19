@@ -8,6 +8,7 @@ let app = new Vue({
             tab: 0,
             settings: {
                 tiempoCobro: 180,
+                diasCobro: [],
                 rmin: 30,
                 actionMax: 100
             },            
@@ -207,14 +208,11 @@ let app = new Vue({
             });
             return result;
         },
-        habilitarCobro( ...args ) {
-            let saldoDisponible = args[0],
-                date = new Date( ).getDate(),
+        habilitarCobro( saldoDisponible, dias ) {
+            let date = new Date( ).getDate(),
                 enable = false;
-            args.forEach( (arg, index) => {
-                if( index != 0) {
-                    enable = enable || (arg==date);
-                }
+            dias.forEach( (dia, index) => {
+                enable = enable || (dia==date);
             })
             return !(enable && (saldoDisponible>=this.settings.rmin));
         },
@@ -296,7 +294,6 @@ let app = new Vue({
 
         cobrar( item ){
             item.released = true;
-            //this.newInvestment = item;
             this.save('wpt_investments', item.id )
         },
 
@@ -416,13 +413,25 @@ let app = new Vue({
                     }
                     break;
                 case 'wpt_investments':
-                    this.investments.push( data )
-                    this.newInvestment = {
-                        usuario: -1,
-                        fecha: '',
-                        monto: 0,
-                        released: false
+                    if( id != -1 ){
+                        let index = -1;
+                        this.investments.forEach( 
+                            (investment, $index) => 
+                            {
+                                if( investment.id == id ) index = $index;
+                            }
+                        );
+                        this.investments[index] = data;
+                    }else{
+                        this.investments.push( data )
+                        this.newInvestment = {
+                            usuario: -1,
+                            fecha: '',
+                            monto: 0,
+                            released: false
+                        }
                     }
+                    
             }
         },
         content( type ){
@@ -482,7 +491,7 @@ let app = new Vue({
                 if( type == 'wpt_users') { dataSend.append('value', JSON.stringify( this.users.filter( user => user.id == $index )[0] ) ); }
                 else if( type == 'wpt_rates' ) { dataSend.append('value', JSON.stringify( this.rate.filter( rate => rate.id == $index )[0] ) ); }
                 else if( type == 'wpt_settings' ) { dataSend.append('value', JSON.stringify( this.settings ) ); }
-                //else { dataSend.append('value', JSON.stringify( this.investments.filter( investment => investment.id == $index )[0] ) ); }
+                else { dataSend.append('value', JSON.stringify( this.investments.filter( investment => investment.id == $index )[0] ) ); }
             }
             
             const { data } = await axios.post(ajaxurl, dataSend);

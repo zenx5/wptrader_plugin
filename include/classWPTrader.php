@@ -103,7 +103,7 @@ class WP_Trader {
         $id = isset($atts['id'])?isset($atts['id']):self::get_id( get_current_user_id() );
         $users = json_decode( get_option('wpt_users'), true);
         foreach( $users as $user ){
-            if( $user['id'] == $id ) {
+            if( $user['wpid'] == $id ) {
                 if( !!$user['enable'] ) {
                     return $content;
                 }
@@ -112,6 +112,7 @@ class WP_Trader {
                 }
             }
         }
+        return "";
     }
 
     public static function shortcode_info( $atts, $content ) {
@@ -173,7 +174,7 @@ class WP_Trader {
 
 
     public static function shortcode_get_data( $atts, $content ) {
-        $id = isset($atts['id'])?isset($atts['id']):self::get_id( get_current_user_id() );
+        $id = isset($atts['id'])?$atts['id']:self::get_id( get_current_user_id() );
         
         if ( !isset( $atts['field'] ) ) {
             return "campo no especificado";
@@ -184,7 +185,8 @@ class WP_Trader {
         if( in_array($field, ["cobro", "saldo", "inversion", "recibidos", "acciones"]) ) {
             switch( $field ) {
                 case "cobro":
-                    return self::get_time($id)->days;
+                    return 0;
+                    //return self::get_time($id)->days;
                     break;
                 case "saldo":
                     return self::get_total_avalaible($id);
@@ -224,7 +226,16 @@ class WP_Trader {
                 }
             }
         }
-        return 'usuario no existente';
+        return '';
+    }
+    
+    public static function get_wpid( $id ) {
+        $users = json_decode( get_option('wpt_users'), true);
+        foreach( $users as $user ) {
+            if( $user['id'] == $id ) {
+                return $user['wpid'];
+            }
+        }
     }
 
     public static function get_id( $wpid ) {
@@ -240,30 +251,31 @@ class WP_Trader {
         $rates = json_decode( get_option('wpt_rates'), true );
         foreach( $rates as $rate ){
             if( ( $mount > $rate['investmin'] ) && ( $mount <= $rate['investmax'] ) ) {
-                return $rate['rate']*$mount;
+                return $rate['rate']*$mount/100;
             }
         }
         return 0;
     }
     
     public static function get_total_avalaible($id){
+        $id = self::get_id($id);
         $investments = json_decode( get_option('wpt_investments'), true );
         $settings = json_decode( get_option('wpt_settings'), true );
         $total = 0;
+        $e = [];
         foreach( $investments as $investment ) {
+            
             if( $investment['usuario'] == $id ) {
                 if( !!! $investment['released']  ) {
-                    if( self::get_time($id, $investment['id'])->days <= ($settings[0]['tiempoCobro']-$settings[0]['rmin']) ) {
-                        $days = $settings[0]['tiempoCobro'] - self::get_time($id)->days;
-                        $days = $days>0?$days:0;
-                        $total += $days * self::calculate_gain( (float)$investment['monto'] );
-                    }
+                    $days = $settings[0]['tiempoCobro'] - self::get_time($id, $investment['id'])->days;
+                    $days = $days>0?$days:0;
+                    $total += $days * self::calculate_gain( (float)$investment['monto'] );
                 }
             }
         }
-        if( $total >= $settings[0]['rmin'] ) {
-            return $total;
-        }
+        
+        return json_encode( $total - self::get_total_released(self::get_wpid($id)) );
+        
         return 0;
     }
 
@@ -273,17 +285,12 @@ class WP_Trader {
         $idsInvestment = [];
         foreach( $investments as $investment ) {
             $idsInvestment[] = $investment['id'];
-            if( $investment['usuario'] == $id ) {
-                if( !! $investment['released']  ) {
-                    $total += (float) $investment['monto'];
-                }
-            }
         }
         $users = json_decode( get_option('wpt_users'), true );
         foreach( $users as $user ){
-            if( $user['id'] == $id ) {
+            if( $user['wpid'] == $id ) {
                 foreach( $user['cobrado'] as $idI => $monto ){
-                    if( in_array($idI,  $investment ) ){
+                    if( in_array($idI,  $idsInvestment ) ){
                         $monto = $monto ?? 0;
                         $total += $monto;
                     }
@@ -393,7 +400,7 @@ class WP_Trader {
                 return $user['nombre']." ".$user['apellido'];
             }
         }
-        return "Usuario no existe";   
+        return "";   
     }
 
     public static function javascript_ajax(){
@@ -554,6 +561,7 @@ class WP_Trader {
             array(
                 "id" => 0,
                 "tiempoCobro" => 180,
+                "diasCobro" => [],
                 "rmin" => 30,
                 "actionMax" => 100,
                 "contrySelect" => ["all"],

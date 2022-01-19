@@ -188,7 +188,28 @@
                             </v-data-table>
                         </v-row>
                     </v-col>
-                    <v-col><v-col>
+                    <v-col>
+                    <v-autocomplete
+                        :items="[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]"
+                        chips
+                        v-model="settings.diasCobro"
+                        label="Dias de cobro"
+                        full-width
+                        hide-details
+                        hide-no-data
+                        hide-selected
+                        multiple
+                        @change="save('wpt_settings',0)">
+                        <template v-slot:selection="data">
+                            <v-chip
+                                close
+                                @click:close="settings.diasCobro = settings.diasCobro.filter( dia => dia != data.item);save('wpt_settings',0);">
+                                {{data.item}}
+                            </v-chip>
+                        </template>
+                        
+                    </v-autocomplete>
+                    <v-col>
                 </v-row>
             </v-container>
         </v-form>

@@ -133,10 +133,10 @@
                         </span>
                     </template>
                     <template #item.generado="{item}">
-                        <span>
-                            {{porCobrar( settings.tiempoCobro-item.cobro, item.monto, getUserById(item.usuario).cobrado[item.id] )}}$<br/>
-                            <small>cobrado: {{getUserById(item.usuario).cobrado[item.id] || 0}}$</small>
-                        </span>
+                        <span v-if="!item.released">
+                            {{porCobrar( settings.tiempoCobro-item.cobro, item.monto, getUserById(item.usuario).cobrado[item.id] )}}$
+                        </span><br  v-if="!item.released"/>
+                        <small><b>cobrado:</b> {{getUserById(item.usuario).cobrado[item.id] || 0}}$</small>
                     </template>
                     <template #item.action="{item}">
                         <v-progress-circular
@@ -155,13 +155,12 @@
                             :value="0">
                             <v-icon 
                                 @click="cobrarGenerado(item.usuario, item.id, porCobrar( settings.tiempoCobro-item.cobro, item.monto, getUserById(item.usuario).cobrado[item.id] ))"
-                                :disabled="habilitarCobro(porCobrar( settings.tiempoCobro-item.cobro, item.monto, getUserById(item.usuario).cobrado[item.id] ), 1, 16)"
+                                :disabled="item.released || habilitarCobro(porCobrar( settings.tiempoCobro-item.cobro, item.monto, getUserById(item.usuario).cobrado[item.id] ), settings.diasCobro)"
                                 >mdi-currency-usd</v-icon>    
                         </v-progress-circular>                        
                         <v-icon 
                             @click="del('wpt_investments', item.id)"
                             v-if="!item.released">mdi-delete</v-icon>
-                        
                     </template>
                     </v-data-table>
                 </v-col>
