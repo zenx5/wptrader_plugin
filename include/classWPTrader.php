@@ -174,7 +174,7 @@ class WP_Trader {
 
 
     public static function shortcode_get_data( $atts, $content ) {
-        $id = isset($atts['id'])?$atts['id']:self::get_id( get_current_user_id() );
+        $id = isset($atts['id'])?$atts['id']:get_current_user_id();
         
         if ( !isset( $atts['field'] ) ) {
             return "campo no especificado";
@@ -205,7 +205,7 @@ class WP_Trader {
         $users = json_decode( get_option('wpt_users'), true);
         
         foreach( $users as $user ) {
-            if( $user[ 'id' ] == $id ) {
+            if( $user[ 'id' ] == self::get_id( $id ) ) {
                 if ( !isset($user[ $field ]) ) {
                     return "campo no existente";
                 }
@@ -274,6 +274,7 @@ class WP_Trader {
             }
         }
         
+        //return json_encode( $total );
         return json_encode( $total - self::get_total_released(self::get_wpid($id)) );
         
         return 0;
@@ -302,6 +303,7 @@ class WP_Trader {
     }
 
     public static function get_total_investment($id){
+        $id = self::get_id($id);
         $investments = json_decode( get_option('wpt_investments'), true );
         $total = 0;
         foreach( $investments as $investment ) {
