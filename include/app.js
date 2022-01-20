@@ -5,12 +5,17 @@ let app = new Vue({
     data() {
         return {
             render: false,
+            dialog: false,
+            idUser: 0,
+            idInvestment: 0,
+            montoPorCobrar: 0,
             tab: 0,
             settings: {
                 tiempoCobro: 180,
                 diasCobro: [],
                 rmin: 30,
-                actionMax: 100
+                actionMax: 100,
+                maxInvestment: 0
             },            
             details: -1,
             editRow: -1,
@@ -221,7 +226,7 @@ let app = new Vue({
 
             return 0;
         },
-        porCobrar(diasTranscuridos, inversionInicial, saldoCobrado=0 ){
+        porCobrar(diasTranscuridos, inversionInicial, saldoCobrado = 0 ){
             let porcentage = this.getRate( inversionInicial )/100;
             let saldoGenerado = inversionInicial * diasTranscuridos * porcentage;
             let saldoDisponible = saldoGenerado - saldoCobrado;
@@ -281,15 +286,17 @@ let app = new Vue({
             this.settings.actionMax = 100;
 
         },
-        cobrarGenerado( idUser, idInvestment, monto ){
+        cobrarGenerado( idUser, idInvestment, monto){
+            this.dialog = false;
+            if( parseFloat( this.cobrar ) > parseFloat( monto ) ) return;
             let index = this.getUserById(idUser, true);
-            if( this.users[ index ].cobrado[ idInvestment ] == undefined ){
+            if( this.users[ index ].cobrado[ idInvestment ] == undefined || this.users[ index ].cobrado[ idInvestment ] == null ){
                 this.users[ index ].cobrado[ idInvestment ] = 0;
             }
-            this.users[ index ].cobrado[ idInvestment ] += monto;
+            this.users[ index ].cobrado[ idInvestment ] += parseFloat( this.cobrar );
             this.save('wpt_users', this.users[ index ].id );
-            this.view(-1);
-            this.view(index);
+            this.cobrar = 0;
+            
         },
 
         cobrar( item ){
@@ -350,7 +357,7 @@ let app = new Vue({
                     telefono: "",
                     monto: 0,
                     wpid: -1,
-                    cobrado: [],
+                    cobrado: {},
                     actions: []
                 }; 
             }
@@ -466,13 +473,9 @@ let app = new Vue({
                     return this.newActions;
                 case 'wpt_investments':
                     this.newInvestment.usuario = this.temp.id;
-                    this.investments.forEach( 
-                        investment => 
-                        {
-                            if( investment.id > max ) max = investment.id;
-                        }    
-                    );
-                    this.newInvestment.id = max + 1;
+                    this.newInvestment.id = this.settings.maxInvestment;
+                    this.settings.maxInvestment++;
+                    this.save('wpt_settings',0);
                     return this.newInvestment;
             }
 

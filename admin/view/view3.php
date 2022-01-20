@@ -154,9 +154,9 @@
                             :width="4"
                             :value="0">
                             <v-icon 
-                                @click="cobrarGenerado(item.usuario, item.id, porCobrar( settings.tiempoCobro-item.cobro, item.monto, getUserById(item.usuario).cobrado[item.id] ))"
+                                @click.stop="dialog = true; idUser = item.usuario; idInvestment = item.id; montoPorCobrar = porCobrar( settings.tiempoCobro-item.cobro, item.monto, getUserById(item.usuario).cobrado[item.id] );"
                                 :disabled="item.released || habilitarCobro(porCobrar( settings.tiempoCobro-item.cobro, item.monto, getUserById(item.usuario).cobrado[item.id] ), settings.diasCobro)"
-                                >mdi-currency-usd</v-icon>    
+                                >mdi-currency-usd</v-icon>                            
                         </v-progress-circular>                        
                         <v-icon 
                             @click="del('wpt_investments', item.id)"
@@ -164,6 +164,42 @@
                     </template>
                     </v-data-table>
                 </v-col>
+            </v-row>
+            <v-row justify="center">
+                <v-dialog
+                    v-model="dialog"
+                    max-width="450px">
+                    <v-card>
+                        <v-card-title>
+                            Señale la cantidad que se cobrara:<br>
+
+                        </v-card-title>
+                        <v-card-text>
+                            <v-text-field
+                                label="Monto a Cobrar"
+                                v-model="cobrar"
+                                type="number"
+                                :max="montoPorCobrar"
+                                min="0">
+                            </v-text-field>
+                        </v-card-text>
+                        <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn
+                                color="green darken-1"
+                                text
+                                @click="cobrar = 0; dialog = null;">
+                                Cancelar
+                            </v-btn>
+                            <v-btn
+                                color="green darken-1"
+                                text
+                                @click="cobrarGenerado(idUser, idInvestment, montoPorCobrar )">
+                                Procesar
+                            </v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-dialog>
             </v-row>
         </v-card-text>
     

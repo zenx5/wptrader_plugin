@@ -567,7 +567,8 @@ class WP_Trader {
                 "rmin" => 30,
                 "actionMax" => 100,
                 "contrySelect" => ["all"],
-                "lock" => false
+                "lock" => false,
+                "maxInvestment" => 0,
             )
         ) );
         self::update_settings('wpt_user_fields', self::$settings['wpt_user_fields'] );
