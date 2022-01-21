@@ -78,6 +78,15 @@
                                 :disabled="editRow != index" 
                                 v-model="item.telefono" />
                         </template>
+                        <template #item.enable="{item, index}">
+                            <v-select
+                                :items="[true, false]"
+                                label="Enable"
+                                :disabled="editRow != index" 
+                                v-model="item.enable">
+
+                            </v-select>
+                        </template>
                         <template #item.monto="{item, index}">
                             <v-chip 
                                 v-if="editRow != index"

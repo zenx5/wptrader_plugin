@@ -22,6 +22,7 @@ class WP_Trader {
         'wpt_settings' => [],
         'wpt_user_fields' => [ 
             "monto" => "Monto",
+            "enable" => "Habilitar Acceso",
             "telefono" => "Telefono",
             "postalcode" => "Codigo Postal",
             "pais" => "Pais",
@@ -58,6 +59,7 @@ class WP_Trader {
             'wpt_actions' => [],
             'wpt_user_fields' => [ 
                 "monto" => "Monto",
+                "enable" => "Habilitar Acceso",
                 "telefono" => "Telefono",
                 "postalcode" => "Codigo Postal",
                 "pais" => "Pais",
@@ -100,7 +102,7 @@ class WP_Trader {
     }
 
     public static function shortcode_enable_access( $atts, $content ) {
-        $id = isset($atts['id'])?isset($atts['id']):self::get_id( get_current_user_id() );
+        $id = isset($atts['id'])?$atts['id']:get_current_user_id();
         $users = json_decode( get_option('wpt_users'), true);
         foreach( $users as $user ){
             if( $user['wpid'] == $id ) {
@@ -185,8 +187,7 @@ class WP_Trader {
         if( in_array($field, ["cobro", "saldo", "inversion", "recibidos", "acciones"]) ) {
             switch( $field ) {
                 case "cobro":
-                    return 0;
-                    //return self::get_time($id)->days;
+                    return self::get_time($id);
                     break;
                 case "saldo":
                     return self::get_total_avalaible($id);
@@ -269,6 +270,7 @@ class WP_Trader {
                 if( !!! $investment['released']  ) {
                     $days = $settings[0]['tiempoCobro'] - self::get_time($id, $investment['id'])->days;
                     $days = $days>0?$days:0;
+                    
                     $total += $days * self::calculate_gain( (float)$investment['monto'] );
                 }
             }
@@ -326,8 +328,8 @@ class WP_Trader {
                 $max = $times[ $investment['id'] ];
             }
         }
-        if( $id_investment ) {
-            return $times[ $id_investment ];
+        if( $id_investment !== null ) {
+            return $times[$id_investment];
         }
         
         
